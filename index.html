@@ -2220,7 +2220,7 @@ window.openGame=function(name){
     <div style="display:flex;gap:18px;justify-content:center">
       <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">得分<br><span id="mb-score" style="font-size:1.4rem;font-weight:700;color:#FCD34D">0</span></div>
       <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">生命<br><span id="mb-lives" style="font-size:1.4rem;font-weight:700;color:#F87171">❤️❤️❤️</span></div>
-      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">关卡<br><span id="mb-level" style="font-size:1.4rem;font-weight:700;color:white">1</span></div>
+      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">进度<br><span id="mb-level" style="font-size:1.4rem;font-weight:700;color:white">0/10</span></div>
     </div>
     <div id="mb-question" style="font-family:'Fredoka One',cursive;font-size:2.2rem;color:white;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center">点击开始！</div>
     <canvas id="mb-canvas" width="320" height="380" style="border-radius:16px;max-width:100%;touch-action:none"></canvas>
@@ -3293,8 +3293,9 @@ const MB_LEVELS = [
   {ops:['×'],     max:9 },
 ];
 const MB_COLORS = ['#EF4444','#F59E0B','#10B981','#6366F1','#EC4899','#0EA5E9','#14B8A6','#F97316'];
-let mbScore=0, mbLevel=1, mbLives=3, mbRunning=false;
-let mbBalloons=[], mbQuestion=null, mbAnimID=null, mbCorrectAns=0, mbCorrectCount=0;
+const MB_TOTAL_Q = 10;
+let mbScore=0, mbLevel=1, mbLives=3, mbRunning=false, mbAnsweredQ=0, mbCorrectCount=0;
+let mbBalloons=[], mbPops=[], mbQuestion=null, mbAnimID=null;
 let mbCanvas=null, mbCtx=null;
 
 function genMBQuestion(level) {
@@ -3314,118 +3315,111 @@ function genMBQuestion(level) {
     b=Math.floor(Math.random()*lv.max)+1;
     ans=a*b;
   }
-  const expr = `${a} ${op} ${b} = ?`;
+  const expr=`${a} ${op} ${b} = ?`;
   const wrongs=new Set();
-  while(wrongs.size<3){
-    const w=ans+Math.floor(Math.random()*7)-3;
-    if(w!==ans&&w>=0) wrongs.add(w);
-  }
-  const choices=shuffle([ans,...wrongs]);
-  return {expr, ans, choices};
+  while(wrongs.size<3){const w=ans+Math.floor(Math.random()*9)-4; if(w!==ans&&w>=0) wrongs.add(w);}
+  return {expr, ans, choices:shuffle([ans,...wrongs])};
 }
 
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function startMathBall() {
   stopMathBall();
-  mbScore=0; mbLevel=1; mbLives=3; mbCorrectCount=0; mbRunning=true;
+  mbScore=0; mbLevel=1; mbLives=3; mbCorrectCount=0; mbAnsweredQ=0;
+  mbRunning=true; mbPops=[];
   mbCanvas=document.getElementById('mb-canvas');
   mbCtx=mbCanvas.getContext('2d');
   updateMBUI();
-  mbQuestion=genMBQuestion(mbLevel);
-  document.getElementById('mb-question').textContent=mbQuestion.expr;
-  mbBalloons=[];
-  spawnMBBalloons();
+  mbNextQuestion();
   mbLoop();
 }
 
-function spawnMBBalloons() {
-  if(!mbQuestion) return;
-  mbBalloons=[];
-  const xs=[40,110,185,255];
-  const H=mbCanvas.height;
-  mbQuestion.choices.forEach((num,i)=>{
-    mbBalloons.push({
-      x:xs[i], y:H - 30 - i*65,
-      vy:-(0.6+Math.random()*0.6),
-      r:34, num, color:MB_COLORS[Math.floor(Math.random()*MB_COLORS.length)],
-      popping:false, popFrame:0
-    });
-  });
+function mbNextQuestion() {
+  mbQuestion=genMBQuestion(mbLevel);
+  document.getElementById('mb-question').textContent=mbQuestion.expr;
+  mbSpawnBalloons();
+}
+
+function mbSpawnBalloons() {
+  if(!mbQuestion||!mbCanvas) return;
+  const H=mbCanvas.height, W=mbCanvas.width;
+  // 4 random x positions spread across canvas, shuffled choices
+  const slots=shuffle([0,1,2,3]).map(i=>40+i*(W-80)/3+Math.random()*18-9);
+  mbBalloons=mbQuestion.choices.map((num,i)=>({
+    x: slots[i],
+    y: H-30-Math.random()*(H*0.5),
+    vy: -(0.45+Math.random()*0.65),
+    r: 34, num,
+    color: MB_COLORS[Math.floor(Math.random()*MB_COLORS.length)]
+  }));
 }
 
 function mbLoop() {
-  if(!mbRunning){return;}
+  if(!mbRunning) return;
   const ctx=mbCtx, W=mbCanvas.width, H=mbCanvas.height;
   ctx.clearRect(0,0,W,H);
-  let escaped=false;
-  mbBalloons.forEach(b=>{
-    if(b.popping){
-      b.popFrame++;
-      drawBalloonPop(ctx,b);
-      return;
-    }
+  // draw balloons
+  for(const b of mbBalloons) {
     b.y+=b.vy;
-    // draw balloon
+    if(b.y+b.r < 0) {
+      if(b.num===mbQuestion.ans) {
+        mbLives--; updateMBUI();
+        if(mbLives<=0){mbRunning=false;cancelAnimationFrame(mbAnimID);showResult('💔','游戏结束！',mbScore,'分',startMathBall);return;}
+      }
+      // recycle back from bottom with new random x
+      b.y=H+50; b.x=40+Math.random()*(W-80); b.vy=-(0.45+Math.random()*0.65);
+    }
     ctx.save();
-    ctx.shadowColor='rgba(0,0,0,0.25)'; ctx.shadowBlur=8;
+    ctx.shadowColor='rgba(0,0,0,0.3)'; ctx.shadowBlur=10;
     ctx.beginPath(); ctx.ellipse(b.x,b.y,b.r,b.r*1.15,0,0,Math.PI*2);
     ctx.fillStyle=b.color; ctx.fill();
     ctx.restore();
-    // highlight
-    ctx.beginPath(); ctx.ellipse(b.x-8,b.y-12,8,5,Math.PI*-0.3,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.fill();
-    // string
-    ctx.beginPath(); ctx.moveTo(b.x,b.y+b.r*1.15); ctx.lineTo(b.x,b.y+b.r*1.15+20);
-    ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
-    // number
+    ctx.beginPath(); ctx.ellipse(b.x-9,b.y-13,8,5,Math.PI*-0.3,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(b.x,b.y+b.r*1.15); ctx.lineTo(b.x,b.y+b.r*1.15+22);
+    ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
     ctx.font='bold 20px Nunito'; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillStyle='white'; ctx.fillText(b.num,b.x,b.y);
-    if(b.y+b.r < 0) {
-      if(b.num===mbQuestion.ans) {
-        mbLives--; updateMBUI(); escaped=true;
-        if(mbLives<=0){mbRunning=false;clearTimeout(mbAnimID);showResult('💔','游戏结束！',mbScore,'分',startMathBall);return;}
-      }
-      b.y=H+60; b.vy=-(0.6+Math.random()*0.6);
+  }
+  // draw pop particles (separate from balloon logic)
+  mbPops=mbPops.filter(p=>{
+    p.f++;
+    if(p.f>14) return false;
+    const prog=p.f/14;
+    ctx.globalAlpha=1-prog;
+    for(let i=0;i<8;i++){
+      const a=(i/8)*Math.PI*2, d=prog*52;
+      ctx.beginPath();
+      ctx.arc(p.x+Math.cos(a)*d, p.y+Math.sin(a)*d, (1-prog)*11, 0, Math.PI*2);
+      ctx.fillStyle=p.c; ctx.fill();
     }
+    ctx.globalAlpha=1;
+    return true;
   });
-  mbBalloons=mbBalloons.filter(b=>!(b.popping&&b.popFrame>12));
   mbAnimID=requestAnimationFrame(mbLoop);
 }
 
-function drawBalloonPop(ctx,b){
-  const p=b.popFrame/12;
-  for(let i=0;i<8;i++){
-    const angle=(i/8)*Math.PI*2;
-    const d=p*40;
-    ctx.beginPath();
-    ctx.arc(b.x+Math.cos(angle)*d, b.y+Math.sin(angle)*d, (1-p)*8, 0, Math.PI*2);
-    ctx.fillStyle=b.color; ctx.fill();
-  }
-}
-
-function mbCanvasTap(cx,cy){
+function mbCanvasTap(cx,cy) {
   if(!mbRunning||!mbQuestion) return;
-  for(let b of mbBalloons){
-    if(b.popping) continue;
+  for(const b of mbBalloons) {
     const dx=cx-b.x, dy=cy-b.y;
-    if(dx*dx+dy*dy<(b.r+10)*(b.r+10)){
-      if(b.num===mbQuestion.ans){
-        b.popping=true; b.popFrame=0;
-        mbBalloons=[b]; // drop old balloons immediately, keep only pop anim
-        mbScore+=10; mbCorrectCount++;
-        if(mbCorrectCount%5===0){mbLevel=Math.min(3,mbLevel+1);}
-        playHit();
-        mbQuestion=genMBQuestion(mbLevel);
-        document.getElementById('mb-question').textContent=mbQuestion.expr;
-        updateMBUI();
-        setTimeout(()=>{mbBalloons=[];spawnMBBalloons();},450);
+    if(dx*dx+dy*dy<(b.r+12)*(b.r+12)) {
+      if(b.num===mbQuestion.ans) {
+        mbPops.push({x:b.x, y:b.y, c:b.color, f:0});
+        mbScore+=10; mbCorrectCount++; mbAnsweredQ++;
+        if(mbCorrectCount%5===0) mbLevel=Math.min(3,mbLevel+1);
+        playHit(); updateMBUI();
+        if(mbAnsweredQ>=MB_TOTAL_Q) {
+          mbRunning=false; cancelAnimationFrame(mbAnimID);
+          showResult('🏆',`答对${MB_TOTAL_Q}题！`,mbScore,'分',startMathBall);
+          return;
+        }
+        mbNextQuestion(); // immediately spawn new balloons — no setTimeout
       } else {
         playMiss();
         mbLives--; updateMBUI();
-        // flash balloon red
         const orig=b.color; b.color='#FF0000';
-        setTimeout(()=>{if(b)b.color=orig;},300);
+        setTimeout(()=>{b.color=orig;},300);
         if(mbLives<=0){mbRunning=false;cancelAnimationFrame(mbAnimID);showResult('💔','游戏结束！',mbScore,'分',startMathBall);}
       }
       return;
@@ -3436,7 +3430,7 @@ function mbCanvasTap(cx,cy){
 function updateMBUI(){
   document.getElementById('mb-score').textContent=mbScore;
   document.getElementById('mb-score-top').textContent='⭐ '+mbScore;
-  document.getElementById('mb-level').textContent=mbLevel;
+  document.getElementById('mb-level').textContent=mbAnsweredQ+'/'+MB_TOTAL_Q;
   document.getElementById('mb-lives').textContent='❤️'.repeat(Math.max(0,mbLives));
 }
 
