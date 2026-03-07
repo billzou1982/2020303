@@ -3187,27 +3187,43 @@ let memCols=4, memTall=false;
 function startMemory(cols=4, tall=false) {
   stopMemory();
   memCols=cols; memTall=tall;
-  const rows = tall ? cols+1 : cols;
+  // ensure even total: cols=3→rows=4, cols=4→rows=4 or 5
+  const rows = tall ? cols+1 : (cols===3 ? 4 : cols);
   const total = cols * rows;
   const pairsNeeded = total / 2;
   const theme = MEM_THEMES[Math.floor(Math.random()*MEM_THEMES.length)];
   const emojis = theme.slice(0, pairsNeeded);
   const deck = [...emojis, ...emojis];
-  // shuffle
   for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
-  memCards = deck.map((e,i)=>({id:i, emoji:e, flipped:false, matched:false}));
-  memFlipped=[]; memMatched=new Set(); memMoves=0; memSeconds=0; memLocking=false;
-  memRunning=true;
+  // start all flipped=true for preview
+  memCards = deck.map((e,i)=>({id:i, emoji:e, flipped:true, matched:false}));
+  memFlipped=[]; memMatched=new Set(); memMoves=0; memSeconds=0; memLocking=true; memRunning=false;
   renderMemory(cols, rows);
   document.getElementById('mem-score').textContent='0';
   document.getElementById('mem-time').textContent='0秒';
   document.getElementById('mem-pairs').textContent='0';
-  clearInterval(memTimerID);
-  memTimerID=setInterval(()=>{
-    if(!memRunning) return;
-    memSeconds++;
-    document.getElementById('mem-time').textContent=memSeconds+'秒';
-    document.getElementById('mem-timer-display').textContent=memSeconds+'秒';
+  // countdown 3→2→1 then hide
+  let countdown=3;
+  document.getElementById('mem-timer-display').textContent='记住！'+countdown+'秒';
+  const cdID=setInterval(()=>{
+    countdown--;
+    if(countdown>0){
+      document.getElementById('mem-timer-display').textContent='记住！'+countdown+'秒';
+    } else {
+      clearInterval(cdID);
+      // flip all face-down and start
+      memCards.forEach(c=>c.flipped=false);
+      renderMemory(cols, rows);
+      memLocking=false; memRunning=true;
+      document.getElementById('mem-timer-display').textContent='0秒';
+      clearInterval(memTimerID);
+      memTimerID=setInterval(()=>{
+        if(!memRunning) return;
+        memSeconds++;
+        document.getElementById('mem-time').textContent=memSeconds+'秒';
+        document.getElementById('mem-timer-display').textContent=memSeconds+'秒';
+      },1000);
+    }
   },1000);
 }
 
