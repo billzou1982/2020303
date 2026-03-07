@@ -3374,14 +3374,6 @@ function mbLoop() {
     }
   });
   mbBalloons=mbBalloons.filter(b=>!(b.popping&&b.popFrame>12));
-  if(mbBalloons.filter(b=>!b.popping).length<4&&mbRunning){
-    // refill any missing
-    while(mbBalloons.filter(b=>!b.popping).length<4){
-      const xs=[40,110,185,255];
-      const idx=mbBalloons.filter(b=>!b.popping).length;
-      // just refill — new question handles this
-    }
-  }
   mbAnimID=requestAnimationFrame(mbLoop);
 }
 
