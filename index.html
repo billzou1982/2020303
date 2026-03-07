@@ -381,6 +381,33 @@ body {
 
 /* confetti canvas */
 #confetti-cv { position:fixed;inset:0;pointer-events:none;z-index:199; }
+
+/* ═══ MEMORY MATCH ═══ */
+.mem-card { perspective:600px; cursor:pointer; }
+.mem-card-inner { position:relative; width:100%; height:100%;
+  transform-style:preserve-3d; transition:transform 0.4s; }
+.mem-card.flipped .mem-card-inner,
+.mem-card.matched .mem-card-inner { transform:rotateY(180deg); }
+.mem-card-front, .mem-card-back {
+  position:absolute; inset:0; backface-visibility:hidden;
+  border-radius:12px; display:flex; align-items:center; justify-content:center; }
+.mem-card-front { background:linear-gradient(135deg,#818cf8,#6366f1); font-size:1.5rem; color:rgba(255,255,255,0.3); }
+.mem-card-back  { background:white; transform:rotateY(180deg); font-size:2rem; }
+.mem-card.matched .mem-card-back { background:#d1fae5; box-shadow:0 0 0 3px #34d399; }
+
+/* ═══ MAZE ═══ */
+.maze-arrow-grid { display:grid; grid-template-columns:repeat(3,56px); grid-template-rows:repeat(2,56px); gap:6px; justify-content:center; margin-top:10px; }
+.maze-arrow-btn { background:rgba(255,255,255,0.18); border:none; border-radius:12px; color:white; font-size:1.5rem; cursor:pointer; width:56px; height:56px; transition:background 0.15s; }
+.maze-arrow-btn:active { background:rgba(255,255,255,0.4); }
+
+/* ═══ IDIOM ═══ */
+.idiom-slot { width:56px; height:56px; border-radius:12px; border:3px dashed rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; font-size:1.6rem; font-weight:700; color:white; background:rgba(255,255,255,0.1); transition:all 0.2s; }
+.idiom-slot.filled { border-color:#FCD34D; background:rgba(252,211,77,0.25); }
+.idiom-char-btn { padding:12px 16px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.3); border-radius:14px; color:white; font-size:1.4rem; font-weight:700; cursor:pointer; transition:transform 0.15s,background 0.15s; min-width:50px; }
+.idiom-char-btn:active { transform:scale(0.92); }
+.idiom-char-btn:disabled { opacity:0.35; cursor:not-allowed; }
+@keyframes idiomShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+.idiom-shake { animation:idiomShake 0.5s ease; }
 </style>
 </head>
 <body>
@@ -490,6 +517,46 @@ body {
         <button class="play-btn" style="background:#DB2777;box-shadow:0 4px 0 #9D174D">🎂 开始玩！</button>
       </div>
     </div>
+
+    <!-- Memory Match -->
+    <div class="game-card" onclick="openGame('memory')">
+      <div class="card-banner" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)">🃏</div>
+      <div class="card-body">
+        <div class="card-name">记忆翻牌</div>
+        <div class="card-desc">翻开卡片，找到两张一样的配对！考验你的记忆力！</div>
+        <button class="play-btn" style="background:#EC4899;box-shadow:0 4px 0 #BE185D">🃏 开始玩！</button>
+      </div>
+    </div>
+
+    <!-- Math Balloon -->
+    <div class="game-card" onclick="openGame('mathball')">
+      <div class="card-banner" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">🎈</div>
+      <div class="card-body">
+        <div class="card-name">气球数学</div>
+        <div class="card-desc">气球上写着数字，快点击正确答案的气球！</div>
+        <button class="play-btn" style="background:#F59E0B;box-shadow:0 4px 0 #B45309">🎈 开始玩！</button>
+      </div>
+    </div>
+
+    <!-- Idiom Puzzle -->
+    <div class="game-card" onclick="openGame('idiom')">
+      <div class="card-banner" style="background:linear-gradient(135deg,#B45309,#D97706)">📖</div>
+      <div class="card-body">
+        <div class="card-name">成语拼字</div>
+        <div class="card-desc">看提示，从文字中挑出四个字，拼出完整成语！</div>
+        <button class="play-btn" style="background:#D97706;box-shadow:0 4px 0 #92400E">📖 开始玩！</button>
+      </div>
+    </div>
+
+    <!-- Maze -->
+    <div class="game-card" onclick="openGame('maze')">
+      <div class="card-banner" style="background:linear-gradient(135deg,#065F46,#10B981)">🌀</div>
+      <div class="card-body">
+        <div class="card-name">迷宫探险</div>
+        <div class="card-desc">帮小老鼠走出迷宫，找到香喷喷的奶酪！</div>
+        <button class="play-btn" style="background:#10B981;box-shadow:0 4px 0 #047857">🐭 开始玩！</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -568,6 +635,7 @@ function openGame(name) {
 
 function goBack() {
   stopWhack(); stopFruit(); stopPuzzle(); stopColor(); stopPiano(); stopBubble(); stopDotConnect(); stopCake();
+  stopMemory(); stopMathBall(); stopIdiom(); stopMaze();
   document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
   document.getElementById('hall').style.display = 'block';
   currentGame = null;
@@ -2119,6 +2187,89 @@ window.openGame=function(name){
   </div>
 </div>
 
+<!-- ═══ MEMORY MATCH SCREEN ═══ -->
+<div class="game-screen" id="memory-game" style="background:linear-gradient(135deg,#1e1b4b,#4c1d95)">
+  <div class="game-topbar" style="background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.1)">
+    <button class="back-btn" onclick="goBack()" style="background:rgba(255,255,255,0.12);color:white">←</button>
+    <div class="game-topbar-title" style="color:white">🃏 记忆翻牌</div>
+    <div class="score-display" id="mem-timer-display">0秒</div>
+  </div>
+  <div class="game-content" style="padding:12px 16px 30px;align-items:center;gap:10px">
+    <div style="display:flex;gap:18px;justify-content:center;margin-bottom:4px">
+      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">得分<br><span id="mem-score" style="font-size:1.4rem;font-weight:700;color:#FCD34D">0</span></div>
+      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">用时<br><span id="mem-time" style="font-size:1.4rem;font-weight:700;color:white">0秒</span></div>
+      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">配对数<br><span id="mem-pairs" style="font-size:1.4rem;font-weight:700;color:#34D399">0</span></div>
+    </div>
+    <div id="mem-board" style="display:grid;gap:8px;justify-content:center;width:100%;max-width:380px"></div>
+    <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;justify-content:center">
+      <button onclick="startMemory(3)" style="padding:10px 18px;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.3);border-radius:20px;color:white;font-weight:700;cursor:pointer;font-size:0.9rem">3×4 简单</button>
+      <button onclick="startMemory(4)" style="padding:10px 18px;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.3);border-radius:20px;color:white;font-weight:700;cursor:pointer;font-size:0.9rem">4×4 中等</button>
+      <button onclick="startMemory(4,true)" style="padding:10px 18px;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.3);border-radius:20px;color:white;font-weight:700;cursor:pointer;font-size:0.9rem">4×5 困难</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MATH BALLOON SCREEN ═══ -->
+<div class="game-screen" id="mathball-game" style="background:linear-gradient(180deg,#0f172a,#1e3a5f)">
+  <div class="game-topbar" style="background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.1)">
+    <button class="back-btn" onclick="goBack()" style="background:rgba(255,255,255,0.12);color:white">←</button>
+    <div class="game-topbar-title" style="color:white">🎈 气球数学</div>
+    <div class="score-display" id="mb-score-top">⭐ 0</div>
+  </div>
+  <div class="game-content" style="padding:10px 16px 20px;align-items:center;gap:8px">
+    <div style="display:flex;gap:18px;justify-content:center">
+      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">得分<br><span id="mb-score" style="font-size:1.4rem;font-weight:700;color:#FCD34D">0</span></div>
+      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">生命<br><span id="mb-lives" style="font-size:1.4rem;font-weight:700;color:#F87171">❤️❤️❤️</span></div>
+      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">关卡<br><span id="mb-level" style="font-size:1.4rem;font-weight:700;color:white">1</span></div>
+    </div>
+    <div id="mb-question" style="font-family:'Fredoka One',cursive;font-size:2.2rem;color:white;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center">点击开始！</div>
+    <canvas id="mb-canvas" width="320" height="380" style="border-radius:16px;max-width:100%;touch-action:none"></canvas>
+    <button onclick="startMathBall()" style="padding:12px 32px;background:linear-gradient(135deg,#F59E0B,#EF4444);border:none;border-radius:24px;color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 #B45309">🎈 开始游戏！</button>
+  </div>
+</div>
+
+<!-- ═══ IDIOM PUZZLE SCREEN ═══ -->
+<div class="game-screen" id="idiom-game" style="background:linear-gradient(135deg,#451a03,#78350f)">
+  <div class="game-topbar" style="background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.1)">
+    <button class="back-btn" onclick="goBack()" style="background:rgba(255,255,255,0.12);color:white">←</button>
+    <div class="game-topbar-title" style="color:white">📖 成语拼字</div>
+    <div class="score-display" id="idiom-score-top">⭐ 0</div>
+  </div>
+  <div class="game-content" style="padding:16px;align-items:center;gap:14px">
+    <div id="idiom-progress" style="color:rgba(255,255,255,0.55);font-size:0.9rem">第 1 / 15 题</div>
+    <div id="idiom-hint" style="background:rgba(255,255,255,0.12);border-radius:16px;padding:16px 20px;color:white;font-size:1.1rem;text-align:center;max-width:360px;line-height:1.6;min-height:60px"></div>
+    <div id="idiom-slots" style="display:flex;gap:10px;justify-content:center"></div>
+    <button onclick="undoIdiom()" style="padding:8px 20px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.25);border-radius:16px;color:white;font-size:0.9rem;cursor:pointer;font-weight:700">↩ 撤销</button>
+    <div id="idiom-pool" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:360px"></div>
+    <button onclick="startIdiom()" style="padding:12px 32px;background:linear-gradient(135deg,#D97706,#B45309);border:none;border-radius:24px;color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 #92400E">📖 开始游戏！</button>
+  </div>
+</div>
+
+<!-- ═══ MAZE SCREEN ═══ -->
+<div class="game-screen" id="maze-game" style="background:linear-gradient(135deg,#064e3b,#065f46)">
+  <div class="game-topbar" style="background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.1)">
+    <button class="back-btn" onclick="goBack()" style="background:rgba(255,255,255,0.12);color:white">←</button>
+    <div class="game-topbar-title" style="color:white">🌀 迷宫探险</div>
+    <div class="score-display" id="maze-timer-display">0秒</div>
+  </div>
+  <div class="game-content" style="padding:12px 16px 20px;align-items:center;gap:10px">
+    <canvas id="maze-canvas" width="320" height="320" style="border-radius:12px;max-width:100%;touch-action:none"></canvas>
+    <div class="maze-arrow-grid">
+      <div></div>
+      <button class="maze-arrow-btn" onclick="mazeMove('up')">↑</button>
+      <div></div>
+      <button class="maze-arrow-btn" onclick="mazeMove('left')">←</button>
+      <button class="maze-arrow-btn" onclick="mazeMove('down')">↓</button>
+      <button class="maze-arrow-btn" onclick="mazeMove('right')">→</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px">
+      <button onclick="startMaze(9)" style="padding:10px 18px;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.3);border-radius:20px;color:white;font-weight:700;cursor:pointer;font-size:0.9rem">🐭 简单</button>
+      <button onclick="startMaze(13)" style="padding:10px 18px;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.3);border-radius:20px;color:white;font-weight:700;cursor:pointer;font-size:0.9rem">🌀 中等</button>
+      <button onclick="startMaze(17)" style="padding:10px 18px;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.3);border-radius:20px;color:white;font-weight:700;cursor:pointer;font-size:0.9rem">🧀 困难</button>
+    </div>
+  </div>
+</div>
+
 <script>
 
 // ══════════════════════════════
@@ -3020,6 +3171,506 @@ document.getElementById('dc-canvas').addEventListener('touchstart',e=>{
   const t=e.touches[0];
   dcTap(t.clientX-r.left, t.clientY-r.top);
 },{passive:false});
+
+// ══════════════════════════════
+// MEMORY MATCH GAME
+// ══════════════════════════════
+const MEM_THEMES = [
+  ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯'],
+  ['🍎','🍊','🍋','🍇','🍓','🍑','🍒','🍌','🥝','🍉'],
+  ['⭐','🌙','☀️','🌈','⚡','🔥','🌊','🌺','🌸','🦋'],
+];
+let memCards=[], memFlipped=[], memMatched=new Set();
+let memMoves=0, memSeconds=0, memRunning=false, memTimerID=null, memLocking=false;
+let memCols=4, memTall=false;
+
+function startMemory(cols=4, tall=false) {
+  stopMemory();
+  memCols=cols; memTall=tall;
+  const rows = tall ? cols+1 : cols;
+  const total = cols * rows;
+  const pairsNeeded = total / 2;
+  const theme = MEM_THEMES[Math.floor(Math.random()*MEM_THEMES.length)];
+  const emojis = theme.slice(0, pairsNeeded);
+  const deck = [...emojis, ...emojis];
+  // shuffle
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  memCards = deck.map((e,i)=>({id:i, emoji:e, flipped:false, matched:false}));
+  memFlipped=[]; memMatched=new Set(); memMoves=0; memSeconds=0; memLocking=false;
+  memRunning=true;
+  renderMemory(cols, rows);
+  document.getElementById('mem-score').textContent='0';
+  document.getElementById('mem-time').textContent='0秒';
+  document.getElementById('mem-pairs').textContent='0';
+  clearInterval(memTimerID);
+  memTimerID=setInterval(()=>{
+    if(!memRunning) return;
+    memSeconds++;
+    document.getElementById('mem-time').textContent=memSeconds+'秒';
+    document.getElementById('mem-timer-display').textContent=memSeconds+'秒';
+  },1000);
+}
+
+function renderMemory(cols, rows) {
+  const board = document.getElementById('mem-board');
+  const cardSize = Math.min(64, Math.floor((Math.min(window.innerWidth,400)-cols*8-24)/cols));
+  board.style.gridTemplateColumns = `repeat(${cols},${cardSize}px)`;
+  board.innerHTML = memCards.map((c,i)=>`
+    <div class="mem-card${c.flipped?' flipped':''}${c.matched?' matched':''}" style="width:${cardSize}px;height:${cardSize}px" onclick="memClick(${i})">
+      <div class="mem-card-inner">
+        <div class="mem-card-front">?</div>
+        <div class="mem-card-back">${c.emoji}</div>
+      </div>
+    </div>`).join('');
+}
+
+function memClick(i) {
+  if(!memRunning||memLocking) return;
+  const c=memCards[i];
+  if(c.flipped||c.matched) return;
+  c.flipped=true;
+  memFlipped.push(i);
+  updateMemDOM(i,true,false);
+  if(memFlipped.length===2) {
+    memLocking=true; memMoves++;
+    const [a,b]=memFlipped;
+    if(memCards[a].emoji===memCards[b].emoji) {
+      memMatched.add(a); memMatched.add(b);
+      memCards[a].matched=memCards[b].matched=true;
+      updateMemDOM(a,true,true); updateMemDOM(b,true,true);
+      memFlipped=[];  memLocking=false;
+      const pairs=memMatched.size/2;
+      document.getElementById('mem-pairs').textContent=pairs;
+      document.getElementById('mem-score').textContent=memMoves;
+      playHit();
+      if(memMatched.size===memCards.length) {
+        memRunning=false; clearInterval(memTimerID);
+        setTimeout(()=>showResult('🏆','全部找到了！',memMoves,'步完成',()=>startMemory(memCols,memTall)),600);
+      }
+    } else {
+      playMiss();
+      setTimeout(()=>{
+        memCards[a].flipped=memCards[b].flipped=false;
+        updateMemDOM(a,false,false); updateMemDOM(b,false,false);
+        memFlipped=[]; memLocking=false;
+      },800);
+    }
+  }
+}
+
+function updateMemDOM(i, flipped, matched) {
+  const el = document.getElementById('mem-board').children[i];
+  if(!el) return;
+  el.className = 'mem-card'+(flipped?' flipped':'')+(matched?' matched':'');
+}
+
+function stopMemory() {
+  clearInterval(memTimerID); memRunning=false;
+}
+
+// ══════════════════════════════
+// MATH BALLOON GAME
+// ══════════════════════════════
+const MB_LEVELS = [
+  {ops:['+'],     max:10},
+  {ops:['+','-'], max:20},
+  {ops:['×'],     max:9 },
+];
+const MB_COLORS = ['#EF4444','#F59E0B','#10B981','#6366F1','#EC4899','#0EA5E9','#14B8A6','#F97316'];
+let mbScore=0, mbLevel=1, mbLives=3, mbRunning=false;
+let mbBalloons=[], mbQuestion=null, mbAnimID=null, mbCorrectAns=0, mbCorrectCount=0;
+let mbCanvas=null, mbCtx=null;
+
+function genMBQuestion(level) {
+  const lv = MB_LEVELS[Math.min(level-1, MB_LEVELS.length-1)];
+  const op = lv.ops[Math.floor(Math.random()*lv.ops.length)];
+  let a,b,ans;
+  if(op==='+') {
+    a=Math.floor(Math.random()*lv.max)+1;
+    b=Math.floor(Math.random()*(lv.max-a+1));
+    ans=a+b;
+  } else if(op==='-') {
+    a=Math.floor(Math.random()*lv.max)+1;
+    b=Math.floor(Math.random()*a);
+    ans=a-b;
+  } else {
+    a=Math.floor(Math.random()*lv.max)+1;
+    b=Math.floor(Math.random()*lv.max)+1;
+    ans=a*b;
+  }
+  const expr = `${a} ${op} ${b} = ?`;
+  const wrongs=new Set();
+  while(wrongs.size<3){
+    const w=ans+Math.floor(Math.random()*7)-3;
+    if(w!==ans&&w>=0) wrongs.add(w);
+  }
+  const choices=shuffle([ans,...wrongs]);
+  return {expr, ans, choices};
+}
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function startMathBall() {
+  stopMathBall();
+  mbScore=0; mbLevel=1; mbLives=3; mbCorrectCount=0; mbRunning=true;
+  mbCanvas=document.getElementById('mb-canvas');
+  mbCtx=mbCanvas.getContext('2d');
+  updateMBUI();
+  mbQuestion=genMBQuestion(mbLevel);
+  document.getElementById('mb-question').textContent=mbQuestion.expr;
+  mbBalloons=[];
+  spawnMBBalloons();
+  mbLoop();
+}
+
+function spawnMBBalloons() {
+  if(!mbQuestion) return;
+  mbBalloons=[];
+  const W=mbCanvas.width;
+  const xs=[40,110,185,255];
+  mbQuestion.choices.forEach((num,i)=>{
+    mbBalloons.push({
+      x:xs[i], y:mbCanvas.height + 60 + i*30,
+      vy:-(0.6+Math.random()*0.6),
+      r:34, num, color:MB_COLORS[Math.floor(Math.random()*MB_COLORS.length)],
+      popping:false, popFrame:0
+    });
+  });
+}
+
+function mbLoop() {
+  if(!mbRunning){return;}
+  const ctx=mbCtx, W=mbCanvas.width, H=mbCanvas.height;
+  ctx.clearRect(0,0,W,H);
+  let escaped=false;
+  mbBalloons.forEach(b=>{
+    if(b.popping){
+      b.popFrame++;
+      drawBalloonPop(ctx,b);
+      return;
+    }
+    b.y+=b.vy;
+    // draw balloon
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,0.25)'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.ellipse(b.x,b.y,b.r,b.r*1.15,0,0,Math.PI*2);
+    ctx.fillStyle=b.color; ctx.fill();
+    ctx.restore();
+    // highlight
+    ctx.beginPath(); ctx.ellipse(b.x-8,b.y-12,8,5,Math.PI*-0.3,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.fill();
+    // string
+    ctx.beginPath(); ctx.moveTo(b.x,b.y+b.r*1.15); ctx.lineTo(b.x,b.y+b.r*1.15+20);
+    ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
+    // number
+    ctx.font='bold 20px Nunito'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='white'; ctx.fillText(b.num,b.x,b.y);
+    if(b.y+b.r < 0) {
+      if(b.num===mbQuestion.ans) {
+        mbLives--; updateMBUI(); escaped=true;
+        if(mbLives<=0){mbRunning=false;clearTimeout(mbAnimID);showResult('💔','游戏结束！',mbScore,'分',startMathBall);return;}
+      }
+      b.y=H+60; b.vy=-(0.6+Math.random()*0.6);
+    }
+  });
+  mbBalloons=mbBalloons.filter(b=>!(b.popping&&b.popFrame>12));
+  if(mbBalloons.filter(b=>!b.popping).length<4&&mbRunning){
+    // refill any missing
+    while(mbBalloons.filter(b=>!b.popping).length<4){
+      const xs=[40,110,185,255];
+      const idx=mbBalloons.filter(b=>!b.popping).length;
+      // just refill — new question handles this
+    }
+  }
+  mbAnimID=requestAnimationFrame(mbLoop);
+}
+
+function drawBalloonPop(ctx,b){
+  const p=b.popFrame/12;
+  for(let i=0;i<8;i++){
+    const angle=(i/8)*Math.PI*2;
+    const d=p*40;
+    ctx.beginPath();
+    ctx.arc(b.x+Math.cos(angle)*d, b.y+Math.sin(angle)*d, (1-p)*8, 0, Math.PI*2);
+    ctx.fillStyle=b.color; ctx.fill();
+  }
+}
+
+function mbCanvasTap(cx,cy){
+  if(!mbRunning||!mbQuestion) return;
+  for(let b of mbBalloons){
+    if(b.popping) continue;
+    const dx=cx-b.x, dy=cy-b.y;
+    if(dx*dx+dy*dy<(b.r+10)*(b.r+10)){
+      if(b.num===mbQuestion.ans){
+        b.popping=true; b.popFrame=0;
+        mbScore+=10; mbCorrectCount++;
+        if(mbCorrectCount%5===0){mbLevel=Math.min(3,mbLevel+1);}
+        playHit();
+        mbQuestion=genMBQuestion(mbLevel);
+        document.getElementById('mb-question').textContent=mbQuestion.expr;
+        updateMBUI();
+        setTimeout(()=>{mbBalloons=mbBalloons.filter(bb=>!bb.popping);spawnMBBalloons();},400);
+      } else {
+        playMiss();
+        mbLives--; updateMBUI();
+        // flash balloon red
+        const orig=b.color; b.color='#FF0000';
+        setTimeout(()=>{if(b)b.color=orig;},300);
+        if(mbLives<=0){mbRunning=false;cancelAnimationFrame(mbAnimID);showResult('💔','游戏结束！',mbScore,'分',startMathBall);}
+      }
+      return;
+    }
+  }
+}
+
+function updateMBUI(){
+  document.getElementById('mb-score').textContent=mbScore;
+  document.getElementById('mb-score-top').textContent='⭐ '+mbScore;
+  document.getElementById('mb-level').textContent=mbLevel;
+  document.getElementById('mb-lives').textContent='❤️'.repeat(Math.max(0,mbLives));
+}
+
+function stopMathBall(){
+  mbRunning=false;
+  cancelAnimationFrame(mbAnimID);
+}
+
+// wire up mb-canvas tap
+(function(){
+  function mbTapHandler(e){
+    const r=e.target.getBoundingClientRect();
+    const scaleX=e.target.width/r.width;
+    const scaleY=e.target.height/r.height;
+    let cx,cy;
+    if(e.touches){
+      e.preventDefault();
+      cx=(e.touches[0].clientX-r.left)*scaleX;
+      cy=(e.touches[0].clientY-r.top)*scaleY;
+    } else {
+      cx=(e.clientX-r.left)*scaleX;
+      cy=(e.clientY-r.top)*scaleY;
+    }
+    mbCanvasTap(cx,cy);
+  }
+  const cv=document.getElementById('mb-canvas');
+  cv.addEventListener('click',mbTapHandler);
+  cv.addEventListener('touchstart',mbTapHandler,{passive:false});
+})();
+
+// ══════════════════════════════
+// IDIOM PUZZLE GAME
+// ══════════════════════════════
+const IDIOMS = [
+  {chars:'一心一意', hint:'做事专心，不分心', decoys:['二','多']},
+  {chars:'马到成功', hint:'一开始就取得了成功', decoys:['牛','失']},
+  {chars:'一石二鸟', hint:'一个行动达到两个目的', decoys:['三','兔']},
+  {chars:'画龙点睛', hint:'在关键处加上最精彩的内容', decoys:['猫','虎']},
+  {chars:'七上八下', hint:'心里很不安稳、忐忑', decoys:['九','六']},
+  {chars:'四面八方', hint:'来自东南西北各个地方', decoys:['三','五']},
+  {chars:'五颜六色', hint:'颜色很多，非常好看', decoys:['三','九']},
+  {chars:'欢天喜地', hint:'形容非常非常高兴', decoys:['悲','哭']},
+  {chars:'万紫千红', hint:'形容春天百花盛开', decoys:['蓝','绿']},
+  {chars:'一帆风顺', hint:'比喻事情进行得很顺利', decoys:['二','浪']},
+  {chars:'笑口常开', hint:'形容人总是很开心快乐', decoys:['哭','愁']},
+  {chars:'天长地久', hint:'时间很长，感情永远不变', decoys:['短','暂']},
+  {chars:'专心致志', hint:'做事非常认真，全神贯注', decoys:['懒','散']},
+  {chars:'勇往直前', hint:'勇敢地一直向前走', decoys:['退','怕']},
+  {chars:'争分夺秒', hint:'非常珍惜时间，分秒必争', decoys:['慢','懒']},
+];
+let idiomScore=0, idiomIndex=0, idiomAnswer=[], idiomRunning=false;
+let idiomOrder=[], idiomBtnMap={};
+
+function startIdiom(){
+  idiomScore=0; idiomIndex=0; idiomAnswer=[]; idiomRunning=true;
+  idiomOrder=shuffle([...Array(IDIOMS.length).keys()]);
+  loadIdiom();
+  document.getElementById('idiom-score-top').textContent='⭐ 0';
+}
+
+function loadIdiom(){
+  if(idiomIndex>=IDIOMS.length){
+    idiomRunning=false;
+    showResult('🏆','成语达人！',idiomScore,'题答对',startIdiom);
+    return;
+  }
+  const idiom=IDIOMS[idiomOrder[idiomIndex]];
+  document.getElementById('idiom-progress').textContent=`第 ${idiomIndex+1} / ${IDIOMS.length} 题`;
+  document.getElementById('idiom-hint').textContent=idiom.hint;
+  idiomAnswer=[];
+  // render slots
+  const slots=document.getElementById('idiom-slots');
+  slots.innerHTML='<div class="idiom-slot" id="islot0"></div><div class="idiom-slot" id="islot1"></div><div class="idiom-slot" id="islot2"></div><div class="idiom-slot" id="islot3"></div>';
+  // render pool
+  const chars=[...idiom.chars,...idiom.decoys];
+  const shuffled=shuffle(chars);
+  idiomBtnMap={};
+  const pool=document.getElementById('idiom-pool');
+  pool.innerHTML=shuffled.map((ch,i)=>`<button class="idiom-char-btn" id="ibtn${i}" onclick="idiomTap('${ch}',${i})">${ch}</button>`).join('');
+}
+
+function idiomTap(ch, btnIdx){
+  if(!idiomRunning) return;
+  if(idiomAnswer.length>=4) return;
+  const btn=document.getElementById('ibtn'+btnIdx);
+  if(!btn||btn.disabled) return;
+  btn.disabled=true;
+  idiomAnswer.push({ch,btnIdx});
+  const slotEl=document.getElementById('islot'+(idiomAnswer.length-1));
+  if(slotEl){slotEl.textContent=ch;slotEl.classList.add('filled');}
+  if(idiomAnswer.length===4) checkIdiom();
+}
+
+function undoIdiom(){
+  if(!idiomRunning||idiomAnswer.length===0) return;
+  const last=idiomAnswer.pop();
+  const btn=document.getElementById('ibtn'+last.btnIdx);
+  if(btn) btn.disabled=false;
+  const slotEl=document.getElementById('islot'+idiomAnswer.length);
+  if(slotEl){slotEl.textContent='';slotEl.classList.remove('filled');}
+}
+
+function checkIdiom(){
+  const idiom=IDIOMS[idiomOrder[idiomIndex]];
+  const ans=idiomAnswer.map(a=>a.ch).join('');
+  const slotsEl=document.getElementById('idiom-slots');
+  if(ans===idiom.chars){
+    playHit();
+    idiomScore++;
+    document.getElementById('idiom-score-top').textContent='⭐ '+idiomScore;
+    slotsEl.style.background='rgba(52,211,153,0.2)';
+    setTimeout(()=>{slotsEl.style.background='';idiomIndex++;loadIdiom();},700);
+  } else {
+    playMiss();
+    slotsEl.classList.add('idiom-shake');
+    setTimeout(()=>{
+      slotsEl.classList.remove('idiom-shake');
+      // reset answer
+      idiomAnswer.forEach(a=>{
+        const btn=document.getElementById('ibtn'+a.btnIdx);
+        if(btn) btn.disabled=false;
+      });
+      idiomAnswer=[];
+      ['islot0','islot1','islot2','islot3'].forEach(id=>{
+        const s=document.getElementById(id);
+        if(s){s.textContent='';s.classList.remove('filled');}
+      });
+    },600);
+  }
+}
+
+function stopIdiom(){idiomRunning=false;}
+
+// ══════════════════════════════
+// MAZE GAME
+// ══════════════════════════════
+let mazeGrid=[], mazeCols=9, mazeRows=9;
+let mazePlayer={r:0,c:0}, mazeRunning=false, mazeSeconds=0, mazeTimerID=null;
+let mazeKeyHandler=null;
+
+function generateMaze(rows,cols){
+  const grid=Array.from({length:rows},()=>Array.from({length:cols},()=>({walls:[true,true,true,true],visited:false})));
+  // DFS carve
+  function carve(r,c){
+    grid[r][c].visited=true;
+    const dirs=shuffle([[0,1,1,3],[0,-1,3,1],[1,0,2,0],[-1,0,0,2]]);
+    // [dr, dc, wall_of_current, wall_of_neighbor]
+    // walls: 0=top,1=right,2=bottom,3=left
+    for(const [dr,dc,wCur,wNbr] of dirs){
+      const nr=r+dr, nc=c+dc;
+      if(nr>=0&&nr<rows&&nc>=0&&nc<cols&&!grid[nr][nc].visited){
+        grid[r][c].walls[wCur]=false;
+        grid[nr][nc].walls[wNbr]=false;
+        carve(nr,nc);
+      }
+    }
+  }
+  carve(0,0);
+  return grid;
+}
+
+function startMaze(n=9){
+  stopMaze();
+  mazeCols=n; mazeRows=n;
+  mazeGrid=generateMaze(n,n);
+  mazePlayer={r:0,c:0};
+  mazeSeconds=0; mazeRunning=true;
+  document.getElementById('maze-timer-display').textContent='0秒';
+  clearInterval(mazeTimerID);
+  mazeTimerID=setInterval(()=>{
+    if(!mazeRunning) return;
+    mazeSeconds++;
+    document.getElementById('maze-timer-display').textContent=mazeSeconds+'秒';
+  },1000);
+  drawMaze();
+  // keyboard
+  if(mazeKeyHandler) document.removeEventListener('keydown',mazeKeyHandler);
+  const arrowMap={'ArrowUp':'up','ArrowDown':'down','ArrowLeft':'left','ArrowRight':'right'};
+  mazeKeyHandler=e=>{if(arrowMap[e.key]){e.preventDefault();mazeMove(arrowMap[e.key]);}};
+  document.addEventListener('keydown',mazeKeyHandler);
+}
+
+function mazeMove(dir){
+  if(!mazeRunning) return;
+  const {r,c}=mazePlayer;
+  const cell=mazeGrid[r][c];
+  const moves={up:[-1,0,0],down:[1,0,2],left:[0,-1,3],right:[0,1,1]};
+  const [dr,dc,wallIdx]=moves[dir];
+  if(cell.walls[wallIdx]) return; // wall blocks
+  const nr=r+dr, nc=c+dc;
+  if(nr<0||nr>=mazeRows||nc<0||nc>=mazeCols) return;
+  mazePlayer={r:nr,c:nc};
+  drawMaze();
+  if(nr===mazeRows-1&&nc===mazeCols-1){
+    mazeRunning=false; clearInterval(mazeTimerID);
+    if(mazeKeyHandler){document.removeEventListener('keydown',mazeKeyHandler);mazeKeyHandler=null;}
+    playHit();
+    setTimeout(()=>showResult('🏆','走出迷宫！',mazeSeconds,'秒完成',()=>startMaze(mazeCols)),400);
+  }
+}
+
+function drawMaze(){
+  const canvas=document.getElementById('maze-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const cellW=W/mazeCols, cellH=H/mazeRows;
+  ctx.clearRect(0,0,W,H);
+  // background
+  ctx.fillStyle='#064e3b'; ctx.fillRect(0,0,W,H);
+  // exit highlight
+  ctx.fillStyle='rgba(16,185,129,0.3)';
+  ctx.fillRect((mazeCols-1)*cellW,(mazeRows-1)*cellH,cellW,cellH);
+  // draw walls
+  ctx.strokeStyle='#6ee7b7'; ctx.lineWidth=2;
+  for(let r=0;r<mazeRows;r++){
+    for(let c=0;c<mazeCols;c++){
+      const x=c*cellW, y=r*cellH;
+      const w=mazeGrid[r][c].walls;
+      ctx.beginPath();
+      if(w[0]){ctx.moveTo(x,y);ctx.lineTo(x+cellW,y);}  // top
+      if(w[1]){ctx.moveTo(x+cellW,y);ctx.lineTo(x+cellW,y+cellH);} // right
+      if(w[2]){ctx.moveTo(x,y+cellH);ctx.lineTo(x+cellW,y+cellH);} // bottom
+      if(w[3]){ctx.moveTo(x,y);ctx.lineTo(x,y+cellH);} // left
+      ctx.stroke();
+    }
+  }
+  // start marker
+  ctx.beginPath(); ctx.arc(cellW*0.5,cellH*0.5,6,0,Math.PI*2);
+  ctx.fillStyle='#34D399'; ctx.fill();
+  // cheese emoji at exit
+  ctx.font=`${Math.min(cellW,cellH)*0.7}px serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('🧀',(mazeCols-0.5)*cellW,(mazeRows-0.5)*cellH);
+  // player
+  ctx.font=`${Math.min(cellW,cellH)*0.7}px serif`;
+  ctx.fillText('🐭',(mazePlayer.c+0.5)*cellW,(mazePlayer.r+0.5)*cellH);
+}
+
+function stopMaze(){
+  mazeRunning=false;
+  clearInterval(mazeTimerID);
+  if(mazeKeyHandler){document.removeEventListener('keydown',mazeKeyHandler);mazeKeyHandler=null;}
+}
 
 </script>
 </body>
