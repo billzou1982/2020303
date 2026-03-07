@@ -3342,11 +3342,11 @@ function startMathBall() {
 function spawnMBBalloons() {
   if(!mbQuestion) return;
   mbBalloons=[];
-  const W=mbCanvas.width;
   const xs=[40,110,185,255];
+  const H=mbCanvas.height;
   mbQuestion.choices.forEach((num,i)=>{
     mbBalloons.push({
-      x:xs[i], y:mbCanvas.height + 60 + i*30,
+      x:xs[i], y:H - 30 - i*65,
       vy:-(0.6+Math.random()*0.6),
       r:34, num, color:MB_COLORS[Math.floor(Math.random()*MB_COLORS.length)],
       popping:false, popFrame:0
@@ -3412,13 +3412,14 @@ function mbCanvasTap(cx,cy){
     if(dx*dx+dy*dy<(b.r+10)*(b.r+10)){
       if(b.num===mbQuestion.ans){
         b.popping=true; b.popFrame=0;
+        mbBalloons=[b]; // drop old balloons immediately, keep only pop anim
         mbScore+=10; mbCorrectCount++;
         if(mbCorrectCount%5===0){mbLevel=Math.min(3,mbLevel+1);}
         playHit();
         mbQuestion=genMBQuestion(mbLevel);
         document.getElementById('mb-question').textContent=mbQuestion.expr;
         updateMBUI();
-        setTimeout(()=>{mbBalloons=mbBalloons.filter(bb=>!bb.popping);spawnMBBalloons();},400);
+        setTimeout(()=>{mbBalloons=[];spawnMBBalloons();},450);
       } else {
         playMiss();
         mbLives--; updateMBUI();
