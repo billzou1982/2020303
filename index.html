@@ -1431,116 +1431,122 @@ const COLOR_DRAWINGS = {
   cat: (ctx,w,h)=>{
     const cx=w/2,cy=h*0.52,r=h*0.3;
     // Body
-    const bg=ctx.createRadialGradient(cx,cy,r*0.1,cx,cy,r*1.1);
-    bg.addColorStop(0,'#FFF8DC');bg.addColorStop(1,'#FFD700');
     ctx.beginPath();ctx.ellipse(cx,cy,r*0.75,r*0.65,0,0,Math.PI*2);ctx.fillStyle='#f0f0f0';ctx.fill();
-    ctx.strokeStyle='#555';ctx.lineWidth=2.5;ctx.stroke();
-    // Head
-    ctx.beginPath();ctx.arc(cx,cy-r*0.6,r*0.52,0,Math.PI*2);ctx.fillStyle='#f0f0f0';ctx.fill();ctx.stroke();
-    // Ears
-    [[-1,1]].forEach(()=>{
-      [[-0.38,-0.28],[ 0.38,-0.28]].forEach(([ex,ey])=>{
-        ctx.beginPath();ctx.moveTo(cx+ex*r,cy-r*0.6+ey*r);
-        ctx.lineTo(cx+(ex-0.18)*r,cy-r*0.6+(ey-0.32)*r);
-        ctx.lineTo(cx+(ex+0.18)*r,cy-r*0.6+(ey-0.32)*r);
-        ctx.closePath();ctx.fillStyle='#f0f0f0';ctx.fill();ctx.stroke();
-        // Inner ear
-        ctx.beginPath();ctx.moveTo(cx+ex*r,cy-r*0.6+ey*r);
-        ctx.lineTo(cx+(ex-0.1)*r,cy-r*0.6+(ey-0.22)*r);
-        ctx.lineTo(cx+(ex+0.1)*r,cy-r*0.6+(ey-0.22)*r);
-        ctx.closePath();ctx.fillStyle='#ffcccc';ctx.fill();
-      });
+    ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+    // Body stripes
+    ctx.strokeStyle='rgba(185,170,150,0.5)';ctx.lineWidth=2;
+    [-0.3,0,0.3].forEach(dx=>{
+      ctx.beginPath();ctx.moveTo(cx+dx*r,cy-r*0.35);ctx.lineTo(cx+dx*r,cy+r*0.3);ctx.stroke();
     });
-    // Eyes
-    [[-0.2,0.2]].forEach(()=>{
-      [[-0.18,0],[0.18,0]].forEach(([ex])=>{
-        ctx.beginPath();ctx.arc(cx+ex*r,cy-r*0.62,r*0.1,0,Math.PI*2);ctx.fillStyle='#333';ctx.fill();
-        ctx.beginPath();ctx.arc(cx+ex*r+r*0.03,cy-r*0.65,r*0.04,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
-      });
+    // Tail — closed fillable region
+    ctx.beginPath();
+    ctx.moveTo(cx+r*0.72,cy+r*0.28);
+    ctx.bezierCurveTo(cx+r*1.15,cy,cx+r*1.3,cy-r*0.48,cx+r*1.0,cy-r*0.72);
+    ctx.bezierCurveTo(cx+r*0.82,cy-r*0.62,cx+r*0.72,cy-r*0.2,cx+r*0.72,cy+r*0.28);
+    ctx.closePath();ctx.fillStyle='#f0f0f0';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+    // Tail ring stripe
+    ctx.strokeStyle='rgba(185,170,150,0.55)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(cx+r*0.92,cy+r*0.08);ctx.bezierCurveTo(cx+r*1.12,cy-r*0.1,cx+r*1.22,cy-r*0.38,cx+r*1.0,cy-r*0.52);ctx.stroke();
+    // Head
+    ctx.beginPath();ctx.arc(cx,cy-r*0.6,r*0.52,0,Math.PI*2);ctx.fillStyle='#f0f0f0';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+    // Ears
+    [[-0.38,-0.28],[0.38,-0.28]].forEach(([ex,ey])=>{
+      ctx.beginPath();ctx.moveTo(cx+ex*r,cy-r*0.6+ey*r);
+      ctx.lineTo(cx+(ex-0.18)*r,cy-r*0.6+(ey-0.32)*r);
+      ctx.lineTo(cx+(ex+0.18)*r,cy-r*0.6+(ey-0.32)*r);
+      ctx.closePath();ctx.fillStyle='#f0f0f0';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(cx+ex*r,cy-r*0.6+ey*r);
+      ctx.lineTo(cx+(ex-0.1)*r,cy-r*0.6+(ey-0.22)*r);
+      ctx.lineTo(cx+(ex+0.1)*r,cy-r*0.6+(ey-0.22)*r);
+      ctx.closePath();ctx.fillStyle='#ffcccc';ctx.fill();
+    });
+    // Eyebrows
+    ctx.strokeStyle='#555';ctx.lineWidth=2;
+    [[-0.18],[0.18]].forEach(([ex])=>{
+      ctx.beginPath();ctx.arc(cx+ex*r,cy-r*0.75,r*0.1,Math.PI+0.4,Math.PI*2-0.4);ctx.stroke();
+    });
+    // Eyes — bigger with white base
+    [[-0.18],[0.18]].forEach(([ex])=>{
+      ctx.beginPath();ctx.arc(cx+ex*r,cy-r*0.62,r*0.12,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.beginPath();ctx.arc(cx+ex*r,cy-r*0.62,r*0.075,0,Math.PI*2);ctx.fillStyle='#333';ctx.fill();
+      ctx.beginPath();ctx.arc(cx+ex*r+r*0.03,cy-r*0.645,r*0.03,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
     });
     // Nose
     ctx.beginPath();ctx.arc(cx,cy-r*0.5,r*0.06,0,Math.PI*2);ctx.fillStyle='#ff9999';ctx.fill();
-    // Mouth — happy smile
+    // Mouth
     ctx.strokeStyle='#555';ctx.lineWidth=2;
     ctx.beginPath();ctx.arc(cx,cy-r*0.38,r*0.13,0.25,Math.PI-0.25);ctx.stroke();
+    // Rosy cheeks
+    ctx.fillStyle='rgba(255,180,180,0.38)';
+    ctx.beginPath();ctx.ellipse(cx-r*0.3,cy-r*0.5,r*0.15,r*0.1,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+r*0.3,cy-r*0.5,r*0.15,r*0.1,0,0,Math.PI*2);ctx.fill();
     // Whiskers
     ctx.strokeStyle='#aaa';ctx.lineWidth=1.5;
-    [[-1,1]].forEach(()=>{
-      [[-1,1]].forEach(()=>{
-        [[-0.45,-0.55,-0.08,-0.5],[-0.45,-0.5,-0.08,-0.48],[-0.45,-0.46,-0.08,-0.46]].forEach(([x1,y1,x2,y2])=>{
-          ctx.beginPath();ctx.moveTo(cx+x1*r,cy+y1*r);ctx.lineTo(cx+x2*r,cy+y2*r);ctx.stroke();
-          ctx.beginPath();ctx.moveTo(cx-x1*r,cy+y1*r);ctx.lineTo(cx-x2*r,cy+y2*r);ctx.stroke();
-        });
-      });
+    [[-0.45,-0.55,-0.08,-0.5],[-0.45,-0.5,-0.08,-0.48],[-0.45,-0.46,-0.08,-0.46]].forEach(([x1,y1,x2,y2])=>{
+      ctx.beginPath();ctx.moveTo(cx+x1*r,cy+y1*r);ctx.lineTo(cx+x2*r,cy+y2*r);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(cx-x1*r,cy+y1*r);ctx.lineTo(cx-x2*r,cy+y2*r);ctx.stroke();
     });
-    // Tail
-    ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(cx+r*0.72,cy+r*0.3);ctx.bezierCurveTo(cx+r*1.1,cy,cx+r*1.2,cy-r*0.5,cx+r*0.9,cy-r*0.7);ctx.stroke();
-    // Paws
-    [[-0.35,0.35]].forEach(()=>{
-      [[-0.35,0.35]].forEach(()=>{
-        [[cx-r*0.35,cy+r*0.58],[cx+r*0.35,cy+r*0.58]].forEach(([px,py])=>{
-          ctx.beginPath();ctx.ellipse(px,py,r*0.18,r*0.12,0,0,Math.PI*2);ctx.fillStyle='#f0f0f0';ctx.fill();
-          ctx.strokeStyle='#555';ctx.lineWidth=2;ctx.stroke();
-        });
-      });
+    // Paws with toe lines
+    [[cx-r*0.35,cy+r*0.58],[cx+r*0.35,cy+r*0.58]].forEach(([px,py])=>{
+      ctx.beginPath();ctx.ellipse(px,py,r*0.18,r*0.12,0,0,Math.PI*2);ctx.fillStyle='#f0f0f0';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+      ctx.strokeStyle='#888';ctx.lineWidth=1.5;
+      [-0.07,0.07].forEach(dx=>{ctx.beginPath();ctx.moveTo(px+dx*r,py-r*0.07);ctx.lineTo(px+dx*r,py+r*0.07);ctx.stroke();});
     });
   },
   rabbit: (ctx,w,h)=>{
     const cx=w/2,cy=h*0.54,r=h*0.28;
     // Body
     ctx.beginPath();ctx.ellipse(cx,cy,r*0.7,r*0.85,0,0,Math.PI*2);ctx.fillStyle='#f8f8f8';ctx.fill();
-    ctx.strokeStyle='#555';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+    // Belly patch — separate colorable region
+    ctx.beginPath();ctx.ellipse(cx,cy+r*0.1,r*0.38,r*0.5,0,0,Math.PI*2);ctx.fillStyle='#fff0f5';ctx.fill();ctx.strokeStyle='#ddd';ctx.lineWidth=2;ctx.stroke();
     // Head
-    ctx.beginPath();ctx.arc(cx,cy-r*0.85,r*0.5,0,Math.PI*2);ctx.fillStyle='#f8f8f8';ctx.fill();ctx.stroke();
-    // Long ears
-    [[-0.25,0.25]].forEach(()=>{
-      [[-0.22,-0.2],[0.22,-0.2]].forEach(([ex])=>{
-        ctx.beginPath();ctx.ellipse(cx+ex*r,cy-r*1.55,r*0.14,r*0.55,ex>0?0.15:-0.15,0,Math.PI*2);
-        ctx.fillStyle='#f8f8f8';ctx.fill();ctx.stroke();
-        ctx.beginPath();ctx.ellipse(cx+ex*r,cy-r*1.55,r*0.07,r*0.38,ex>0?0.15:-0.15,0,Math.PI*2);
-        ctx.fillStyle='#ffb3c6';ctx.fill();
-      });
+    ctx.beginPath();ctx.arc(cx,cy-r*0.85,r*0.5,0,Math.PI*2);ctx.fillStyle='#f8f8f8';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+    // Long ears — taller and more elegant
+    [[-0.22,-0.2],[0.22,-0.2]].forEach(([ex])=>{
+      ctx.beginPath();ctx.ellipse(cx+ex*r,cy-r*1.65,r*0.14,r*0.62,ex>0?0.12:-0.12,0,Math.PI*2);
+      ctx.fillStyle='#f8f8f8';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+      ctx.beginPath();ctx.ellipse(cx+ex*r,cy-r*1.65,r*0.07,r*0.42,ex>0?0.12:-0.12,0,Math.PI*2);
+      ctx.fillStyle='#ffb3c6';ctx.fill();ctx.strokeStyle='#ffb3c6';ctx.lineWidth=1;ctx.stroke();
     });
     // Eyes
-    [[-0.15,0.15]].forEach(()=>{
-      [[-0.15,0.15]].forEach(()=>{
-        [[cx-r*0.17,cy-r*0.88],[cx+r*0.17,cy-r*0.88]].forEach(([ex,ey])=>{
-          ctx.beginPath();ctx.arc(ex,ey,r*0.1,0,Math.PI*2);ctx.fillStyle='#cc3366';ctx.fill();
-          ctx.beginPath();ctx.arc(ex+r*0.03,ey-r*0.03,r*0.04,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
-        });
-      });
+    [[cx-r*0.17,cy-r*0.88],[cx+r*0.17,cy-r*0.88]].forEach(([ex,ey])=>{
+      ctx.beginPath();ctx.arc(ex,ey,r*0.11,0,Math.PI*2);ctx.fillStyle='#cc3366';ctx.fill();
+      ctx.beginPath();ctx.arc(ex+r*0.03,ey-r*0.03,r*0.04,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
     });
     // Nose
     ctx.beginPath();ctx.arc(cx,cy-r*0.7,r*0.06,0,Math.PI*2);ctx.fillStyle='#ff99bb';ctx.fill();
-    // Mouth — happy smile
+    // Mouth
     ctx.strokeStyle='#555';ctx.lineWidth=2;
     ctx.beginPath();ctx.arc(cx,cy-r*0.56,r*0.14,0.25,Math.PI-0.25);ctx.stroke();
+    // Rosy cheeks
+    ctx.fillStyle='rgba(255,140,175,0.42)';
+    ctx.beginPath();ctx.ellipse(cx-r*0.32,cy-r*0.7,r*0.18,r*0.12,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+r*0.32,cy-r*0.7,r*0.18,r*0.12,0,0,Math.PI*2);ctx.fill();
     // Front paws
     [[cx-r*0.38,cy+r*0.7],[cx+r*0.38,cy+r*0.7]].forEach(([px,py])=>{
-      ctx.beginPath();ctx.ellipse(px,py,r*0.2,r*0.13,0,0,Math.PI*2);ctx.fillStyle='#f8f8f8';ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.ellipse(px,py,r*0.2,r*0.13,0,0,Math.PI*2);ctx.fillStyle='#f8f8f8';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
     });
-    // Tail
-    ctx.beginPath();ctx.arc(cx,cy+r*0.82,r*0.16,0,Math.PI*2);ctx.fillStyle='#f8f8f8';ctx.fill();ctx.stroke();
+    // Fluffy tail
+    ctx.beginPath();ctx.arc(cx,cy+r*0.82,r*0.18,0,Math.PI*2);ctx.fillStyle='#f8f8f8';ctx.fill();ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy+r*0.82,r*0.12,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
   },
   bear: (ctx,w,h)=>{
     const cx=w/2,cy=h*0.52,r=h*0.3;
     // Body
     ctx.beginPath();ctx.ellipse(cx,cy+r*0.1,r*0.72,r*0.8,0,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();
-    ctx.strokeStyle='#6b4a1e';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.strokeStyle='#6b4a1e';ctx.lineWidth=3;ctx.stroke();
     // Belly
-    ctx.beginPath();ctx.ellipse(cx,cy+r*0.25,r*0.4,r*0.5,0,0,Math.PI*2);ctx.fillStyle='#e8c99a';ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,cy+r*0.25,r*0.4,r*0.5,0,0,Math.PI*2);ctx.fillStyle='#e8c99a';ctx.fill();ctx.strokeStyle='#6b4a1e';ctx.lineWidth=2;ctx.stroke();
     // Head
-    ctx.beginPath();ctx.arc(cx,cy-r*0.58,r*0.52,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();ctx.stroke();
-    // Round ears
-    [[-0.42,0.42]].forEach(()=>{
-      [[-0.38,-0.28],[0.38,-0.28]].forEach(([ex,ey])=>{
-        ctx.beginPath();ctx.arc(cx+ex*r,cy-r*0.58+ey*r,r*0.18,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();ctx.stroke();
-        ctx.beginPath();ctx.arc(cx+ex*r,cy-r*0.58+ey*r,r*0.1,0,Math.PI*2);ctx.fillStyle='#a07040';ctx.fill();
-      });
+    ctx.beginPath();ctx.arc(cx,cy-r*0.58,r*0.52,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();ctx.strokeStyle='#6b4a1e';ctx.lineWidth=3;ctx.stroke();
+    // Round ears with inner circle
+    [[-0.38,-0.28],[0.38,-0.28]].forEach(([ex,ey])=>{
+      ctx.beginPath();ctx.arc(cx+ex*r,cy-r*0.58+ey*r,r*0.2,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();ctx.strokeStyle='#6b4a1e';ctx.lineWidth=3;ctx.stroke();
+      ctx.beginPath();ctx.arc(cx+ex*r,cy-r*0.58+ey*r,r*0.11,0,Math.PI*2);ctx.fillStyle='#a07040';ctx.fill();ctx.strokeStyle='#6b4a1e';ctx.lineWidth=1.5;ctx.stroke();
     });
-    // Snout
-    ctx.beginPath();ctx.ellipse(cx,cy-r*0.42,r*0.24,r*0.18,0,0,Math.PI*2);ctx.fillStyle='#e8c99a';ctx.fill();ctx.stroke();
+    // Bigger snout
+    ctx.beginPath();ctx.ellipse(cx,cy-r*0.42,r*0.28,r*0.2,0,0,Math.PI*2);ctx.fillStyle='#e8c99a';ctx.fill();ctx.strokeStyle='#6b4a1e';ctx.lineWidth=2.5;ctx.stroke();
     // Nose
     ctx.beginPath();ctx.arc(cx,cy-r*0.5,r*0.08,0,Math.PI*2);ctx.fillStyle='#333';ctx.fill();
     // Eyes
@@ -1548,35 +1554,36 @@ const COLOR_DRAWINGS = {
       ctx.beginPath();ctx.arc(ex,ey,r*0.1,0,Math.PI*2);ctx.fillStyle='#333';ctx.fill();
       ctx.beginPath();ctx.arc(ex+r*0.03,ey-r*0.03,r*0.04,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
     });
-    // Smile — big happy
+    // Smile
     ctx.strokeStyle='#6b4a1e';ctx.lineWidth=2.5;
     ctx.beginPath();ctx.arc(cx,cy-r*0.34,r*0.18,0.18,Math.PI-0.18);ctx.stroke();
-    // Rosy cheeks
-    ctx.fillStyle='rgba(255,150,150,0.35)';
-    ctx.beginPath();ctx.ellipse(cx-r*0.32,cy-r*0.45,r*0.18,r*0.12,0,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(cx+r*0.32,cy-r*0.45,r*0.18,r*0.12,0,0,Math.PI*2);ctx.fill();
+    // Bigger rosy cheeks
+    ctx.fillStyle='rgba(255,130,130,0.42)';
+    ctx.beginPath();ctx.ellipse(cx-r*0.36,cy-r*0.44,r*0.21,r*0.14,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+r*0.36,cy-r*0.44,r*0.21,r*0.14,0,0,Math.PI*2);ctx.fill();
     // Arms
-    [[-1,1]].forEach(()=>{
-      [[-0.75,0.75]].forEach(()=>{
-        [[cx-r*0.78,cy+r*0.15],[cx+r*0.78,cy+r*0.15]].forEach(([ax,ay],i)=>{
-          ctx.beginPath();ctx.ellipse(ax,ay,r*0.18,r*0.32,i===0?-0.4:0.4,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();ctx.stroke();
-        });
-      });
+    [[cx-r*0.78,cy+r*0.15],[cx+r*0.78,cy+r*0.15]].forEach(([ax,ay],i)=>{
+      ctx.beginPath();ctx.ellipse(ax,ay,r*0.18,r*0.32,i===0?-0.4:0.4,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();ctx.strokeStyle='#6b4a1e';ctx.lineWidth=3;ctx.stroke();
     });
+    // Honey drip on right paw
+    ctx.fillStyle='#FFA500';
+    ctx.beginPath();ctx.ellipse(cx+r*0.78,cy+r*0.42,r*0.1,r*0.07,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.moveTo(cx+r*0.72,cy+r*0.44);ctx.lineTo(cx+r*0.76,cy+r*0.58);ctx.lineTo(cx+r*0.84,cy+r*0.58);ctx.lineTo(cx+r*0.88,cy+r*0.44);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#CC7700';ctx.lineWidth=1.5;ctx.stroke();
     // Legs
     [[cx-r*0.35,cy+r*0.82],[cx+r*0.35,cy+r*0.82]].forEach(([lx,ly])=>{
-      ctx.beginPath();ctx.ellipse(lx,ly,r*0.22,r*0.15,0,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.ellipse(lx,ly,r*0.22,r*0.15,0,0,Math.PI*2);ctx.fillStyle='#c8a06e';ctx.fill();ctx.strokeStyle='#6b4a1e';ctx.lineWidth=3;ctx.stroke();
     });
   },
   penguin: (ctx,w,h)=>{
     const cx=w/2,cy=h*0.5,r=h*0.32;
     // Body
     ctx.beginPath();ctx.ellipse(cx,cy,r*0.6,r*0.85,0,0,Math.PI*2);ctx.fillStyle='#222';ctx.fill();
-    ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.stroke();
-    // White belly
-    ctx.beginPath();ctx.ellipse(cx,cy+r*0.05,r*0.38,r*0.62,0,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.stroke();
+    ctx.strokeStyle='#111';ctx.lineWidth=2.5;ctx.stroke();
+    // White belly — bigger
+    ctx.beginPath();ctx.ellipse(cx,cy+r*0.05,r*0.42,r*0.65,0,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.strokeStyle='#bbb';ctx.lineWidth=2;ctx.stroke();
     // Head
-    ctx.beginPath();ctx.arc(cx,cy-r*0.85,r*0.42,0,Math.PI*2);ctx.fillStyle='#222';ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy-r*0.85,r*0.42,0,Math.PI*2);ctx.fillStyle='#222';ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2.5;ctx.stroke();
     // White face
     ctx.beginPath();ctx.ellipse(cx,cy-r*0.82,r*0.27,r*0.3,0,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
     // Eyes
@@ -1586,7 +1593,7 @@ const COLOR_DRAWINGS = {
     });
     // Beak
     ctx.beginPath();ctx.moveTo(cx,cy-r*0.68);ctx.lineTo(cx-r*0.1,cy-r*0.62);ctx.lineTo(cx+r*0.1,cy-r*0.62);ctx.closePath();
-    ctx.fillStyle='#FF8800';ctx.fill();ctx.strokeStyle='#CC6600';ctx.stroke();
+    ctx.fillStyle='#FF8800';ctx.fill();ctx.strokeStyle='#CC6600';ctx.lineWidth=2;ctx.stroke();
     // Smile
     ctx.strokeStyle='#CC6600';ctx.lineWidth=2;
     ctx.beginPath();ctx.arc(cx,cy-r*0.55,r*0.12,0.25,Math.PI-0.25);ctx.stroke();
@@ -1594,43 +1601,67 @@ const COLOR_DRAWINGS = {
     ctx.fillStyle='rgba(255,150,150,0.4)';
     ctx.beginPath();ctx.ellipse(cx-r*0.28,cy-r*0.62,r*0.16,r*0.1,0,0,Math.PI*2);ctx.fill();
     ctx.beginPath();ctx.ellipse(cx+r*0.28,cy-r*0.62,r*0.16,r*0.1,0,0,Math.PI*2);ctx.fill();
+    // Colorful scarf — new fillable region
+    ctx.beginPath();ctx.ellipse(cx,cy-r*0.44,r*0.62,r*0.13,0,0,Math.PI*2);
+    ctx.fillStyle='#E53E3E';ctx.fill();ctx.strokeStyle='#C62828';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.ellipse(cx,cy-r*0.44,r*0.62,r*0.045,0,0,Math.PI*2);ctx.stroke();
+    // Scarf hanging end
+    ctx.beginPath();ctx.roundRect(cx+r*0.5,cy-r*0.55,r*0.22,r*0.32,r*0.04);
+    ctx.fillStyle='#E53E3E';ctx.fill();ctx.strokeStyle='#C62828';ctx.lineWidth=2;ctx.stroke();
     // Wings
     [[cx-r*0.68,cy-r*0.1,-0.5],[cx+r*0.68,cy-r*0.1,0.5]].forEach(([wx,wy,angle])=>{
-      ctx.beginPath();ctx.ellipse(wx,wy,r*0.18,r*0.45,angle,0,Math.PI*2);ctx.fillStyle='#222';ctx.fill();ctx.strokeStyle='#111';ctx.stroke();
+      ctx.beginPath();ctx.ellipse(wx,wy,r*0.18,r*0.45,angle,0,Math.PI*2);ctx.fillStyle='#222';ctx.fill();ctx.strokeStyle='#111';ctx.lineWidth=2.5;ctx.stroke();
     });
     // Feet
     [[cx-r*0.28,cy+r*0.82],[cx+r*0.28,cy+r*0.82]].forEach(([fx,fy])=>{
-      ctx.beginPath();ctx.ellipse(fx,fy,r*0.22,r*0.1,0,0,Math.PI*2);ctx.fillStyle='#FF8800';ctx.fill();ctx.strokeStyle='#CC6600';ctx.stroke();
+      ctx.beginPath();ctx.ellipse(fx,fy,r*0.22,r*0.1,0,0,Math.PI*2);ctx.fillStyle='#FF8800';ctx.fill();ctx.strokeStyle='#CC6600';ctx.lineWidth=2;ctx.stroke();
     });
   },
   fox: (ctx,w,h)=>{
     const cx=w/2,cy=h*0.52,r=h*0.29;
     // Body
     ctx.beginPath();ctx.ellipse(cx,cy,r*0.65,r*0.75,0,0,Math.PI*2);ctx.fillStyle='#E8720C';ctx.fill();
-    ctx.strokeStyle='#8B3A00';ctx.lineWidth=2.5;ctx.stroke();
-    // White chest
-    ctx.beginPath();ctx.ellipse(cx,cy+r*0.1,r*0.35,r*0.5,0,0,Math.PI*2);ctx.fillStyle='#FFF5E6';ctx.fill();
+    ctx.strokeStyle='#8B3A00';ctx.lineWidth=3;ctx.stroke();
+    // White chest — outlined
+    ctx.beginPath();ctx.ellipse(cx,cy+r*0.1,r*0.35,r*0.5,0,0,Math.PI*2);ctx.fillStyle='#FFF5E6';ctx.fill();ctx.strokeStyle='#ddd';ctx.lineWidth=1.5;ctx.stroke();
+    // Fluffy tail — closed fillable region (much bigger)
+    ctx.beginPath();
+    ctx.moveTo(cx+r*0.6,cy+r*0.45);
+    ctx.bezierCurveTo(cx+r*1.3,cy+r*0.4,cx+r*1.85,cy+r*0.1,cx+r*1.75,cy-r*0.55);
+    ctx.bezierCurveTo(cx+r*1.62,cy-r*0.88,cx+r*1.35,cy-r*0.82,cx+r*1.18,cy-r*0.62);
+    ctx.bezierCurveTo(cx+r*1.05,cy-r*0.45,cx+r*0.92,cy-r*0.12,cx+r*0.6,cy+r*0.45);
+    ctx.closePath();ctx.fillStyle='#E8720C';ctx.fill();ctx.strokeStyle='#8B3A00';ctx.lineWidth=3;ctx.stroke();
+    // White tail tip — separate fillable region
+    ctx.beginPath();
+    ctx.moveTo(cx+r*1.32,cy-r*0.62);
+    ctx.bezierCurveTo(cx+r*1.52,cy-r*0.75,cx+r*1.65,cy-r*0.6,cx+r*1.55,cy-r*0.45);
+    ctx.bezierCurveTo(cx+r*1.45,cy-r*0.32,cx+r*1.22,cy-r*0.38,cx+r*1.18,cy-r*0.55);
+    ctx.bezierCurveTo(cx+r*1.2,cy-r*0.68,cx+r*1.28,cy-r*0.72,cx+r*1.32,cy-r*0.62);
+    ctx.closePath();ctx.fillStyle='#FFF5E6';ctx.fill();ctx.strokeStyle='#ddd';ctx.lineWidth=1.5;ctx.stroke();
     // Head
-    ctx.beginPath();ctx.arc(cx,cy-r*0.72,r*0.48,0,Math.PI*2);ctx.fillStyle='#E8720C';ctx.fill();ctx.strokeStyle='#8B3A00';ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy-r*0.72,r*0.48,0,Math.PI*2);ctx.fillStyle='#E8720C';ctx.fill();ctx.strokeStyle='#8B3A00';ctx.lineWidth=3;ctx.stroke();
     // Pointy ears
-    [[-0.38,0.38]].forEach(()=>{
-      [[-0.35,-0.35],[0.35,-0.35]].forEach(([ex,ey])=>{
-        ctx.beginPath();ctx.moveTo(cx+ex*r,cy-r*0.72+ey*r*0.4);
-        ctx.lineTo(cx+(ex-0.18)*r,cy-r*0.72+(ey-0.4)*r);
-        ctx.lineTo(cx+(ex+0.18)*r,cy-r*0.72+(ey-0.4)*r);
-        ctx.closePath();ctx.fillStyle='#E8720C';ctx.fill();ctx.strokeStyle='#8B3A00';ctx.stroke();
-        ctx.beginPath();ctx.moveTo(cx+ex*r,cy-r*0.72+ey*r*0.35);
-        ctx.lineTo(cx+(ex-0.08)*r,cy-r*0.72+(ey-0.28)*r);
-        ctx.lineTo(cx+(ex+0.08)*r,cy-r*0.72+(ey-0.28)*r);
-        ctx.closePath();ctx.fillStyle='#222';ctx.fill();
-      });
+    [[-0.35,-0.35],[0.35,-0.35]].forEach(([ex,ey])=>{
+      ctx.beginPath();ctx.moveTo(cx+ex*r,cy-r*0.72+ey*r*0.4);
+      ctx.lineTo(cx+(ex-0.18)*r,cy-r*0.72+(ey-0.4)*r);
+      ctx.lineTo(cx+(ex+0.18)*r,cy-r*0.72+(ey-0.4)*r);
+      ctx.closePath();ctx.fillStyle='#E8720C';ctx.fill();ctx.strokeStyle='#8B3A00';ctx.lineWidth=3;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(cx+ex*r,cy-r*0.72+ey*r*0.35);
+      ctx.lineTo(cx+(ex-0.08)*r,cy-r*0.72+(ey-0.28)*r);
+      ctx.lineTo(cx+(ex+0.08)*r,cy-r*0.72+(ey-0.28)*r);
+      ctx.closePath();ctx.fillStyle='#222';ctx.fill();
     });
-    // White face markings
-    ctx.beginPath();ctx.ellipse(cx,cy-r*0.62,r*0.28,r*0.28,0,0,Math.PI*2);ctx.fillStyle='#FFF5E6';ctx.fill();
-    // Eyes
+    // White face muzzle
+    ctx.beginPath();ctx.ellipse(cx,cy-r*0.62,r*0.28,r*0.28,0,0,Math.PI*2);ctx.fillStyle='#FFF5E6';ctx.fill();ctx.strokeStyle='#ddd';ctx.lineWidth=1.5;ctx.stroke();
+    // Dark eye mask patches (fox markings)
+    [[-0.18],[0.18]].forEach(([ex])=>{
+      ctx.beginPath();ctx.ellipse(cx+ex*r,cy-r*0.74,r*0.16,r*0.12,ex>0?0.22:-0.22,0,Math.PI*2);ctx.fillStyle='#1a1000';ctx.fill();
+    });
+    // Eyes on top of mask
     [[cx-r*0.17,cy-r*0.74],[cx+r*0.17,cy-r*0.74]].forEach(([ex,ey])=>{
-      ctx.beginPath();ctx.arc(ex,ey,r*0.1,0,Math.PI*2);ctx.fillStyle='#2D4A00';ctx.fill();
-      ctx.beginPath();ctx.arc(ex+r*0.03,ey-r*0.03,r*0.04,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
+      ctx.beginPath();ctx.arc(ex,ey,r*0.08,0,Math.PI*2);ctx.fillStyle='#2D4A00';ctx.fill();
+      ctx.beginPath();ctx.arc(ex+r*0.03,ey-r*0.03,r*0.03,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
     });
     // Nose
     ctx.beginPath();ctx.arc(cx,cy-r*0.52,r*0.07,0,Math.PI*2);ctx.fillStyle='#333';ctx.fill();
@@ -1641,14 +1672,9 @@ const COLOR_DRAWINGS = {
     ctx.fillStyle='rgba(255,150,100,0.35)';
     ctx.beginPath();ctx.ellipse(cx-r*0.3,cy-r*0.5,r*0.18,r*0.11,0,0,Math.PI*2);ctx.fill();
     ctx.beginPath();ctx.ellipse(cx+r*0.3,cy-r*0.5,r*0.18,r*0.11,0,0,Math.PI*2);ctx.fill();
-    // Bushy tail
-    ctx.strokeStyle='#8B3A00';ctx.lineWidth=r*0.35;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(cx+r*0.6,cy+r*0.4);ctx.bezierCurveTo(cx+r*1.1,cy,cx+r*1.3,cy-r*0.5,cx+r*1.0,cy-r*0.7);ctx.stroke();
-    ctx.strokeStyle='white';ctx.lineWidth=r*0.1;
-    ctx.strokeStyle='white';ctx.beginPath();ctx.moveTo(cx+r*0.62,cy+r*0.38);ctx.bezierCurveTo(cx+r*1.08,cy-r*0.05,cx+r*1.25,cy-r*0.38,cx+r*0.95,cy-r*0.62);ctx.stroke();
     // Legs
     [[cx-r*0.32,cy+r*0.72],[cx+r*0.32,cy+r*0.72]].forEach(([lx,ly])=>{
-      ctx.beginPath();ctx.ellipse(lx,ly,r*0.16,r*0.14,0,0,Math.PI*2);ctx.fillStyle='#E8720C';ctx.fill();ctx.strokeStyle='#8B3A00';ctx.stroke();
+      ctx.beginPath();ctx.ellipse(lx,ly,r*0.16,r*0.14,0,0,Math.PI*2);ctx.fillStyle='#E8720C';ctx.fill();ctx.strokeStyle='#8B3A00';ctx.lineWidth=3;ctx.stroke();
     });
   }
 };
@@ -2107,139 +2133,138 @@ window.openGame=function(name){
 const DC_ANIMALS = {
   cat: {
     name:'🐱 小猫咪', color:'#FFB347', emoji:'🐱',
-    // 20 pts trace cat face: left ear tip → around head → right ear tip → back along outline → face details
+    // 20 pts trace cat face: wide spread across full canvas
     pts:[
-      [100,48],  // 1  left ear tip
-      [112,78],  // 2  left ear base inner
-      [132,65],  // 3  top-left head
-      [160,58],  // 4  top head center
-      [188,65],  // 5  top-right head
-      [208,78],  // 6  right ear base inner
-      [220,48],  // 7  right ear tip
-      [215,88],  // 8  right ear base outer
-      [238,108], // 9  right cheek top
-      [244,135], // 10 right cheek mid
-      [232,162], // 11 jaw right
-      [206,178], // 12 chin right
-      [160,185], // 13 chin center
-      [114,178], // 14 chin left
-      [88,162],  // 15 jaw left
-      [76,135],  // 16 left cheek mid
-      [82,108],  // 17 left cheek top
-      [85,88],   // 18 left ear base outer
-      [140,122], // 19 left eye
-      [180,122], // 20 right eye
+      [80,32],   // 1  left ear tip
+      [108,68],  // 2  left ear base inner
+      [82,88],   // 3  upper left head
+      [65,115],  // 4  left cheek top
+      [62,148],  // 5  left cheek bottom
+      [78,175],  // 6  chin left
+      [108,188], // 7  chin
+      [160,192], // 8  chin center
+      [212,188], // 9  chin right
+      [242,175], // 10 chin right outer
+      [258,148], // 11 right cheek bottom
+      [255,115], // 12 right cheek top
+      [238,88],  // 13 upper right head
+      [212,68],  // 14 right ear base inner
+      [240,32],  // 15 right ear tip
+      [222,72],  // 16 right ear outer
+      [200,52],  // 17 top right head
+      [160,44],  // 18 top head center
+      [128,122], // 19 left eye
+      [192,122], // 20 right eye
     ],
-    // Decoy positions (shown as ?)
-    decoys:[[160,155],[160,90],[125,95],[195,95],[160,48]]
+    decoys:[[160,155],[160,90],[118,100],[202,100],[160,44]]
   },
   bird: {
     name:'🐦 小鸟', color:'#60C0F0', emoji:'🐦',
-    // Side-profile bird: beak → head arc → back → tail → belly → breast → back to beak
+    // Side-profile bird: beak → head arc → back → tail → belly → back to beak
     pts:[
-      [252,112], // 1  beak tip
-      [235,95],  // 2  upper beak
-      [215,78],  // 3  forehead
-      [188,62],  // 4  crown
-      [158,58],  // 5  top of head
-      [128,68],  // 6  nape
-      [100,88],  // 7  upper back
-      [78,112],  // 8  mid back
-      [65,140],  // 9  lower back
-      [58,168],  // 10 tail root
-      [40,178],  // 11 tail tip upper
-      [52,192],  // 12 tail tip lower
-      [78,182],  // 13 tail root lower
-      [110,188], // 14 rump / belly rear
-      [148,192], // 15 belly mid
-      [182,185], // 16 belly front
-      [208,168], // 17 breast lower
-      [228,145], // 18 throat lower
-      [244,125], // 19 throat upper
-      [252,112], // 20 back to beak (close)
+      [278,112], // 1  beak tip
+      [258,92],  // 2  upper beak
+      [232,72],  // 3  forehead
+      [198,52],  // 4  crown
+      [160,45],  // 5  top of head
+      [125,55],  // 6  nape
+      [95,75],   // 7  upper back
+      [68,100],  // 8  mid back
+      [48,132],  // 9  lower back
+      [38,165],  // 10 tail root
+      [22,182],  // 11 tail tip upper
+      [38,198],  // 12 tail tip lower
+      [65,188],  // 13 tail root lower
+      [102,195], // 14 rump
+      [148,202], // 15 belly mid
+      [188,195], // 16 belly front
+      [218,175], // 17 breast lower
+      [248,148], // 18 throat
+      [270,128], // 19 throat upper
+      [278,112], // 20 back to beak (close)
     ],
-    decoys:[[160,130],[130,155],[200,105],[78,155],[160,78]]
+    decoys:[[160,128],[130,155],[200,105],[78,152],[160,78]]
   },
   fish: {
     name:'🐟 小鱼', color:'#7DD3FC', emoji:'🐟',
-    // Side fish: tail fins → body arc → head → mouth → belly arc back
+    // Side fish: tail fins → body → head → mouth → back → dorsal fin
     pts:[
-      [58,105],  // 1  tail fin upper tip
-      [52,132],  // 2  tail center
-      [58,158],  // 3  tail fin lower tip
-      [88,148],  // 4  tail base lower
-      [118,158], // 5  belly rear
-      [152,165], // 6  belly mid
-      [185,158], // 7  belly front
-      [212,145], // 8  underjaw
-      [235,128], // 9  mouth lower
-      [245,115], // 10 mouth tip
-      [235,102], // 11 mouth upper
-      [212,90],  // 12 snout
-      [182,80],  // 13 forehead
-      [152,75],  // 14 back front
-      [120,78],  // 15 back mid
-      [92,88],   // 16 back rear
-      [72,100],  // 17 tail base upper
-      [152,108], // 18 eye position
-      [168,85],  // 19 dorsal fin tip
-      [185,105], // 20 dorsal fin base
+      [40,82],   // 1  tail fin upper tip
+      [28,128],  // 2  tail center
+      [40,172],  // 3  tail fin lower tip
+      [75,158],  // 4  tail base lower
+      [112,172], // 5  belly rear
+      [155,182], // 6  belly mid
+      [195,172], // 7  belly front
+      [228,155], // 8  underjaw
+      [252,135], // 9  mouth lower
+      [268,115], // 10 mouth tip
+      [252,98],  // 11 mouth upper
+      [228,82],  // 12 snout
+      [195,68],  // 13 forehead
+      [155,60],  // 14 back front
+      [118,65],  // 15 back mid
+      [82,78],   // 16 back rear
+      [52,90],   // 17 tail base upper
+      [155,110], // 18 eye
+      [178,68],  // 19 dorsal fin tip
+      [198,105], // 20 dorsal fin base
     ],
-    decoys:[[160,132],[100,118],[220,118],[152,155],[195,75]]
+    decoys:[[160,132],[100,118],[222,118],[155,155],[195,72]]
   },
   rabbit: {
     name:'🐰 兔子', color:'#F9A8D4', emoji:'🐰',
-    // Front-facing rabbit: left long ear → head arc → right long ear → body → feet
+    // Front-facing rabbit: tall ears reach top, body fills lower half
     pts:[
-      [130,28],  // 1  left ear tip
-      [118,58],  // 2  left ear mid
-      [122,90],  // 3  left ear base
-      [104,102], // 4  head left
-      [84,122],  // 5  left cheek
-      [78,150],  // 6  chin left
-      [88,175],  // 7  neck left
-      [78,200],  // 8  body left upper
-      [72,228],  // 9  body left lower
-      [96,240],  // 10 left foot tip
-      [125,235], // 11 between feet
-      [160,240], // 12 right foot tip
-      [188,235], // 13 right foot
-      [182,228], // 14 body right lower
-      [172,200], // 15 body right upper
-      [172,175], // 16 neck right
-      [182,150], // 17 chin right
-      [176,122], // 18 right cheek
-      [158,102], // 19 head right
-      [150,28],  // 20 right ear tip
+      [128,25],  // 1  left ear tip
+      [115,55],  // 2  left ear mid
+      [118,90],  // 3  left ear base
+      [100,105], // 4  head left
+      [78,128],  // 5  left cheek
+      [72,158],  // 6  chin left
+      [82,185],  // 7  neck left
+      [70,212],  // 8  body left upper
+      [62,240],  // 9  body left lower
+      [88,252],  // 10 left foot tip
+      [122,245], // 11 between feet left
+      [160,250], // 12 center bottom
+      [198,245], // 13 between feet right
+      [232,252], // 14 right foot tip
+      [258,240], // 15 body right lower
+      [250,212], // 16 body right upper
+      [238,185], // 17 neck right
+      [248,158], // 18 chin right
+      [222,128], // 19 right cheek
+      [192,25],  // 20 right ear tip
     ],
-    decoys:[[160,165],[105,200],[215,200],[160,85],[160,128]]
+    decoys:[[160,168],[105,200],[215,200],[160,85],[160,128]]
   },
   horse: {
     name:'🐴 小马', color:'#B8860B', emoji:'🐴',
-    // Side-profile horse: nose → head → mane → back → tail → legs → belly → chest → neck back to nose
+    // Side-profile horse: nose → head → mane → back → tail → hind leg
     pts:[
-      [245,95],  // 1  nose tip
-      [240,75],  // 2  upper lip
-      [230,62],  // 3  nose bridge
-      [218,52],  // 4  forehead
-      [198,42],  // 5  poll (top head)
-      [178,38],  // 6  mane front
-      [158,35],  // 7  mane mid
-      [135,40],  // 8  mane rear
-      [112,52],  // 9  neck-back / withers
-      [88,65],   // 10 shoulder top
-      [68,78],   // 11 back start
-      [55,100],  // 12 mid back
-      [52,125],  // 13 croup
-      [60,150],  // 14 tail root
-      [48,178],  // 15 tail tip
-      [72,162],  // 16 tail lower
-      [88,172],  // 17 hindquarter
-      [100,195], // 18 hind leg upper
-      [108,228], // 19 hind leg lower
-      [118,240], // 20 hind hoof
+      [258,92],  // 1  nose tip
+      [255,70],  // 2  upper lip
+      [242,55],  // 3  nose bridge
+      [228,45],  // 4  forehead
+      [208,38],  // 5  poll (top head)
+      [185,32],  // 6  mane front
+      [158,28],  // 7  mane mid
+      [132,35],  // 8  mane rear
+      [108,50],  // 9  withers
+      [82,65],   // 10 shoulder
+      [58,82],   // 11 back start
+      [45,108],  // 12 mid back
+      [48,135],  // 13 croup
+      [58,158],  // 14 tail root
+      [42,188],  // 15 tail tip
+      [68,170],  // 16 tail lower
+      [92,182],  // 17 hindquarter
+      [108,210], // 18 hind leg upper
+      [118,242], // 19 hind leg lower
+      [130,255], // 20 hind hoof
     ],
-    decoys:[[160,120],[180,90],[140,160],[90,120],[200,120]]
+    decoys:[[160,120],[180,88],[140,162],[90,118],[205,120]]
   }
 };
 
@@ -2502,6 +2527,8 @@ const CAKE_STEPS = [
 
 let cakeStep=0, cakeChoices={}, cakeMixCount=0, cakeCtx=null, cakeAnimID=null;
 let cakeBakeProgress=0, cakeBaking=false, cakeBakeTimer=null;
+let cakeDrag={active:false, item:null, x:0, y:0};
+let cakePourAnim=0;
 
 function initCake(){
   const cv=document.getElementById('cake-canvas');
@@ -2509,6 +2536,7 @@ function initCake(){
   cv.style.width=size+'px'; cv.style.height=Math.round(size*260/320)+'px';
   cakeCtx=cv.getContext('2d');
   cakeStep=0; cakeChoices={}; cakeMixCount=0; cakeBakeProgress=0; cakeBaking=false;
+  cakeDrag={active:false,item:null,x:0,y:0}; cakePourAnim=0;
   clearInterval(cakeBakeTimer); cancelAnimationFrame(cakeAnimID);
   showCakeStep();
 }
@@ -2591,7 +2619,24 @@ function startBaking(){
   },100);
 }
 
+function triggerCakePour(){
+  cakeDrag.active=false;
+  cakePourAnim=1.0;
+  playHit();
+  const step=CAKE_STEPS[cakeStep];
+  const pourTimer=setInterval(()=>{
+    cakePourAnim=Math.max(0,cakePourAnim-0.07);
+    drawCakeCanvas();
+    if(cakePourAnim<=0){
+      clearInterval(pourTimer);
+      cakeChoices[step.id]=step.choices[0].val;
+      advanceCakeStep();
+    }
+  },35);
+}
+
 function advanceCakeStep(){
+  cakeDrag.active=false; cakePourAnim=0;
   cakeStep++;
   if(cakeStep>=CAKE_STEPS.length){
     finishCake(); return;
@@ -2673,11 +2718,39 @@ function drawCakeCanvas(){
       }
     }
 
-    // Big ingredient to show
+    // Ingredient display — draggable for add_flour/add_egg/add_milk
     const icons={add_flour:'🌾',add_egg:'🥚',add_milk:'🥛',mix:'🥄',flavor:'🍓'};
     const icon=icons[step.id]||'🎂';
-    ctx.font=`${H*0.28}px serif`; ctx.textAlign='center';
-    ctx.fillText(icon,W*0.82,H*0.52);
+    if(['add_flour','add_egg','add_milk'].includes(step.id)){
+      const ix=cakeDrag.active?cakeDrag.x:W*0.82;
+      const iy=cakeDrag.active?cakeDrag.y:H*0.45;
+      ctx.save();
+      if(cakeDrag.active) ctx.globalAlpha=0.82;
+      ctx.font=`${H*0.26}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(icon,ix,iy);
+      ctx.restore();
+      // Pour stream animation
+      if(cakePourAnim>0){
+        ctx.save();
+        ctx.globalAlpha=cakePourAnim*0.9;
+        const g=ctx.createLinearGradient(W*0.82,H*0.42,W*0.5,H*0.63);
+        g.addColorStop(0,'rgba(220,200,160,0.95)');g.addColorStop(1,'rgba(220,200,160,0.3)');
+        ctx.strokeStyle=g;ctx.lineWidth=Math.max(2,9*cakePourAnim);ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(W*0.82,H*0.42);ctx.quadraticCurveTo(W*0.66,H*0.52,W*0.5,H*0.63);ctx.stroke();
+        ctx.restore();
+      }
+      // Hint text at top of canvas
+      if(!cakeDrag.active && cakePourAnim===0){
+        ctx.save();
+        ctx.fillStyle='rgba(255,255,255,0.72)';
+        ctx.font=`bold ${H*0.056}px 'Fredoka One',cursive`;ctx.textAlign='center';ctx.textBaseline='top';
+        ctx.fillText('拖动食材到碗里 ↓',W*0.5,H*0.06);
+        ctx.restore();
+      }
+    } else {
+      ctx.font=`${H*0.28}px serif`; ctx.textAlign='center';
+      ctx.fillText(icon,W*0.82,H*0.52);
+    }
 
   } else if(step.id==='bake'){
     // Oven — only while actively on the bake step
@@ -2873,6 +2946,68 @@ function lighten(hex,amt){
   return '#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
 }
 function darken(hex,amt){ return lighten(hex,-amt); }
+
+// ══ Cake canvas drag-and-drop events ══
+(function(){
+  const cv=document.getElementById('cake-canvas');
+  cv.style.touchAction='none';
+
+  function toCanvas(e){
+    const rect=cv.getBoundingClientRect();
+    const sx=cv.width/rect.width, sy=cv.height/rect.height;
+    return {x:(e.clientX-rect.left)*sx, y:(e.clientY-rect.top)*sy};
+  }
+
+  function ingredientPos(){
+    return {x:cv.width*0.82, y:cv.height*0.45};
+  }
+
+  function isDragStep(){
+    return cakeStep<CAKE_STEPS.length && ['add_flour','add_egg','add_milk'].includes(CAKE_STEPS[cakeStep].id);
+  }
+
+  cv.addEventListener('pointerdown',e=>{
+    if(!isDragStep()) return;
+    if(cakePourAnim>0) return;
+    const p=toCanvas(e), ip=ingredientPos();
+    if(Math.hypot(p.x-ip.x,p.y-ip.y)<38){
+      cakeDrag.active=true; cakeDrag.x=p.x; cakeDrag.y=p.y;
+      cv.setPointerCapture(e.pointerId);
+      drawCakeCanvas();
+    }
+  });
+
+  cv.addEventListener('pointermove',e=>{
+    if(!cakeDrag.active) return;
+    const p=toCanvas(e);
+    cakeDrag.x=p.x; cakeDrag.y=p.y;
+    drawCakeCanvas();
+  });
+
+  cv.addEventListener('pointerup',e=>{
+    if(!isDragStep()) return;
+    if(cakePourAnim>0) return;
+    const p=toCanvas(e);
+    if(cakeDrag.active){
+      cakeDrag.active=false;
+      // Bowl drop zone: center (W*0.5, H*0.64)
+      const bx=cv.width*0.5, by=cv.height*0.64;
+      if(Math.hypot(p.x-bx,p.y-by)<58){
+        triggerCakePour();
+      } else {
+        drawCakeCanvas(); // snap back
+      }
+    } else {
+      // Tap directly on ingredient
+      const ip=ingredientPos();
+      if(Math.hypot(p.x-ip.x,p.y-ip.y)<38) triggerCakePour();
+    }
+  });
+
+  cv.addEventListener('pointercancel',()=>{
+    if(cakeDrag.active){ cakeDrag.active=false; drawCakeCanvas(); }
+  });
+})();
 
 // ══ Wire up canvas events for dot connect ══
 document.getElementById('dc-canvas').addEventListener('click',e=>{
