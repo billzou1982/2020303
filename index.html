@@ -1934,9 +1934,22 @@ const PIANO_SONGS = [
   ]},
 ];
 
-let pianoSongPlaying=false, pianoSongTimeout=null;
+let pianoSongPlaying=false, pianoSongTimeouts=[];
 
 function initPiano() {
+  // Pre-unlock AudioContext on iOS: must happen inside a user-gesture callback.
+  // Playing a silent buffer forces iOS to allow subsequent Web Audio playback.
+  try {
+    const ctx=getAudio();
+    const unlock=()=>{
+      if(ctx.state==='suspended') ctx.resume();
+      const buf=ctx.createBuffer(1,1,22050);
+      const src=ctx.createBufferSource();
+      src.buffer=buf; src.connect(ctx.destination); src.start(0);
+    };
+    // Run immediately (initPiano is called from openGame click handler — a user gesture)
+    unlock();
+  } catch(e){}
   // Song buttons
   const songDiv=document.getElementById('piano-song-btns');
   songDiv.innerHTML='';
@@ -1976,34 +1989,42 @@ function initPiano() {
 function playPianoNote(freq,noteName) {
   try {
     const ctx=getAudio();
-    ctx.resume(); // iOS Safari starts AudioContext suspended; resume on first user gesture
-    const o=ctx.createOscillator(), g=ctx.createGain();
-    const o2=ctx.createOscillator();
-    o.connect(g);o2.connect(g);g.connect(ctx.destination);
-    o.type='triangle';o.frequency.value=freq;
-    o2.type='sine';o2.frequency.value=freq*2;
-    g.gain.setValueAtTime(0.4,ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.2);
-    o.start();o2.start();o.stop(ctx.currentTime+1.2);o2.stop(ctx.currentTime+1.2);
-    document.getElementById('piano-note-display').textContent='🎵 '+noteName;
-    // Add to sheet display
-    const sheet=document.getElementById('piano-sheet');
-    const noteKey=PIANO_KEYS.find(k=>k.freq===freq);
-    if(noteKey){ sheet.textContent=(sheet.textContent+'  '+noteKey.label).slice(-30); }
+    const doPlay=()=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      const o2=ctx.createOscillator();
+      o.connect(g);o2.connect(g);g.connect(ctx.destination);
+      o.type='triangle';o.frequency.value=freq;
+      o2.type='sine';o2.frequency.value=freq*2;
+      g.gain.setValueAtTime(0.4,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.2);
+      o.start();o2.start();o.stop(ctx.currentTime+1.2);o2.stop(ctx.currentTime+1.2);
+      document.getElementById('piano-note-display').textContent='🎵 '+noteName;
+      const sheet=document.getElementById('piano-sheet');
+      const noteKey=PIANO_KEYS.find(k=>k.freq===freq);
+      if(noteKey){ sheet.textContent=(sheet.textContent+'  '+noteKey.label).slice(-30); }
+    };
+    // iOS Safari: AudioContext starts suspended; resume() is async, chain play after it resolves
+    if(ctx.state==='suspended'){ ctx.resume().then(doPlay); } else { doPlay(); }
   } catch(e){}
 }
 
+function stopPianoSong() {
+  pianoSongTimeouts.forEach(id=>clearTimeout(id));
+  pianoSongTimeouts=[];
+  pianoSongPlaying=false;
+}
+
 function playSong(si) {
-  if(pianoSongPlaying){ clearTimeout(pianoSongTimeout); pianoSongPlaying=false; return; }
+  // Always stop any currently playing song first (clears ALL pending timeouts)
+  stopPianoSong();
   pianoSongPlaying=true;
   const notes=PIANO_SONGS[si].notes;
   document.getElementById('piano-sheet').textContent='';
   let t=0;
   notes.forEach(n=>{
-    pianoSongTimeout=setTimeout(()=>{
+    const id=setTimeout(()=>{
       if(!pianoSongPlaying) return;
       playPianoNote(n.f, '♪');
-      // Highlight key
       const keysDiv=document.getElementById('piano-keys');
       const kIdx=PIANO_KEYS.findIndex(k=>Math.abs(k.freq-n.f)<1);
       if(kIdx>=0&&keysDiv.children[kIdx]){
@@ -2012,11 +2033,13 @@ function playSong(si) {
         setTimeout(()=>{ key.style.transform='';key.style.boxShadow='0 6px 0 rgba(0,0,0,0.3)'; },150);
       }
     }, t*1000);
+    pianoSongTimeouts.push(id);
     t+=n.d;
   });
-  setTimeout(()=>{ pianoSongPlaying=false; },t*1000+500);
+  const endId=setTimeout(()=>{ pianoSongPlaying=false; pianoSongTimeouts=[]; }, t*1000+500);
+  pianoSongTimeouts.push(endId);
 }
-function stopPiano() { pianoSongPlaying=false; clearTimeout(pianoSongTimeout); }
+function stopPiano() { stopPianoSong(); }
 
 // ══════════════════════════════
 // BUBBLE GAME
