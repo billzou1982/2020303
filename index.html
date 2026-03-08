@@ -1910,10 +1910,13 @@ function initPiano() {
   // Piano keys
   const keysDiv=document.getElementById('piano-keys');
   keysDiv.innerHTML='';
-  const keyW=Math.min(54, Math.floor((window.innerWidth-40)/PIANO_KEYS.length));
+  const isLandscape = window.innerWidth > window.innerHeight;
+  const maxKeyW = isLandscape ? 90 : 54;
+  const keyW = Math.min(maxKeyW, Math.floor((window.innerWidth-40)/PIANO_KEYS.length));
+  const keyH = isLandscape ? Math.min(keyW*1.8, Math.floor(window.innerHeight*0.45)) : keyW*2.2;
   PIANO_KEYS.forEach(k=>{
     const key=document.createElement('div');
-    key.style.cssText=`width:${keyW}px;height:${keyW*2.2}px;border-radius:0 0 ${keyW*0.3}px ${keyW*0.3}px;
+    key.style.cssText=`width:${keyW}px;height:${keyH}px;border-radius:0 0 ${keyW*0.3}px ${keyW*0.3}px;
       background:${k.color};display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;
       cursor:pointer;user-select:none;box-shadow:0 6px 0 rgba(0,0,0,0.3);
       font-family:'Fredoka One',cursive;font-size:${keyW*0.35}px;color:white;font-weight:bold;
@@ -1933,6 +1936,7 @@ function initPiano() {
 function playPianoNote(freq,noteName) {
   try {
     const ctx=getAudio();
+    ctx.resume(); // iOS Safari starts AudioContext suspended; resume on first user gesture
     const o=ctx.createOscillator(), g=ctx.createGain();
     const o2=ctx.createOscillator();
     o.connect(g);o2.connect(g);g.connect(ctx.destination);
