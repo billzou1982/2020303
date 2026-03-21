@@ -597,28 +597,30 @@ body {
     <div class="game-topbar-title" style="color:white">🟦 俄罗斯方块</div>
     <div class="score-display" id="tetris-score-top">⭐ 0</div>
   </div>
-  <div class="game-content" style="padding:10px 16px 20px;align-items:center;gap:10px">
-    <div style="display:flex;gap:20px;justify-content:center">
-      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">得分<br><span id="tetris-score" style="font-size:1.4rem;font-weight:700;color:#FCD34D">0</span></div>
-      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">等级<br><span id="tetris-level" style="font-size:1.4rem;font-weight:700;color:#60a5fa">1</span></div>
-      <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">消行<br><span id="tetris-lines" style="font-size:1.4rem;font-weight:700;color:#34D399">0</span></div>
-    </div>
-    <div style="display:flex;gap:12px;align-items:flex-start;justify-content:center">
-      <canvas id="tetris-canvas" width="200" height="400" style="border:2px solid rgba(255,255,255,0.2);border-radius:8px;touch-action:none;background:#0f172a"></canvas>
-      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
-        <div style="color:rgba(255,255,255,0.6);font-size:0.8rem">下一个</div>
-        <canvas id="tetris-next" width="80" height="80" style="border:1px solid rgba(255,255,255,0.15);border-radius:6px;background:#0f172a"></canvas>
+  <div class="game-content" style="padding:6px 12px 10px;align-items:center;gap:6px">
+    <!-- Stats + next piece in one compact row -->
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:480px">
+      <div style="display:flex;gap:14px">
+        <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.78rem">得分<br><span id="tetris-score" style="font-size:1.25rem;font-weight:700;color:#FCD34D">0</span></div>
+        <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.78rem">等级<br><span id="tetris-level" style="font-size:1.25rem;font-weight:700;color:#60a5fa">1</span></div>
+        <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.78rem">消行<br><span id="tetris-lines" style="font-size:1.25rem;font-weight:700;color:#34D399">0</span></div>
+      </div>
+      <div style="text-align:center;color:rgba(255,255,255,0.6);font-size:0.78rem">下一个<br>
+        <canvas id="tetris-next" width="64" height="64" style="border:1px solid rgba(255,255,255,0.15);border-radius:6px;background:#0f172a;display:block;margin-top:2px"></canvas>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:8px;margin-top:4px">
+    <!-- Main canvas: size set by initTetris() -->
+    <canvas id="tetris-canvas" width="240" height="480" style="border:2px solid rgba(255,255,255,0.2);border-radius:8px;touch-action:none;background:#0f172a"></canvas>
+    <!-- Controls -->
+    <div style="display:grid;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(2,58px);gap:8px">
       <div></div>
-      <button onclick="tetrisRotate()" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.4rem;cursor:pointer">↻</button>
+      <button onclick="tetrisRotate()" style="width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.5rem;cursor:pointer">↻</button>
       <div></div>
-      <button onclick="tetrisMove(-1)" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.4rem;cursor:pointer">←</button>
-      <button onclick="tetrisDrop()" style="width:56px;height:56px;border-radius:50%;background:rgba(96,165,250,0.35);border:2px solid rgba(96,165,250,0.6);color:white;font-size:1.4rem;cursor:pointer">↓</button>
-      <button onclick="tetrisMove(1)" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.4rem;cursor:pointer">→</button>
+      <button onclick="tetrisMove(-1)" style="width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.5rem;cursor:pointer">←</button>
+      <button onclick="tetrisDrop()" style="width:58px;height:58px;border-radius:50%;background:rgba(96,165,250,0.35);border:2px solid rgba(96,165,250,0.6);color:white;font-size:1.5rem;cursor:pointer">↓</button>
+      <button onclick="tetrisMove(1)" style="width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.5rem;cursor:pointer">→</button>
     </div>
-    <button onclick="startTetris()" id="tetris-start-btn" style="padding:12px 32px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;border-radius:24px;color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 #1e3a8a">🟦 开始游戏！</button>
+    <button onclick="startTetris()" id="tetris-start-btn" style="padding:10px 32px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;border-radius:24px;color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 #1e3a8a">🟦 开始游戏！</button>
   </div>
 </div>
 
@@ -629,21 +631,22 @@ body {
     <div class="game-topbar-title" style="color:white">🐍 贪吃蛇</div>
     <div class="score-display" id="snake-score-top">⭐ 0</div>
   </div>
-  <div class="game-content" style="padding:10px 16px 20px;align-items:center;gap:10px">
-    <div style="display:flex;gap:24px;justify-content:center">
+  <div class="game-content" style="padding:6px 12px 10px;align-items:center;gap:8px">
+    <div style="display:flex;gap:32px;justify-content:center">
       <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">得分<br><span id="snake-score" style="font-size:1.4rem;font-weight:700;color:#FCD34D">0</span></div>
       <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">最高<br><span id="snake-best" style="font-size:1.4rem;font-weight:700;color:#34D399">0</span></div>
     </div>
+    <!-- canvas size set by initSnake() -->
     <canvas id="snake-canvas" width="320" height="320" style="border:2px solid rgba(255,255,255,0.2);border-radius:12px;touch-action:none;background:#052e16"></canvas>
-    <div style="display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,64px);gap:10px">
+    <div style="display:grid;grid-template-columns:repeat(3,62px);grid-template-rows:repeat(2,62px);gap:8px">
       <div></div>
-      <button onclick="snakeDir(0,-1)" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.6rem;cursor:pointer">↑</button>
+      <button onclick="snakeDir(0,-1)" style="width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.6rem;cursor:pointer">↑</button>
       <div></div>
-      <button onclick="snakeDir(-1,0)" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.6rem;cursor:pointer">←</button>
-      <button onclick="snakeDir(0,1)" style="width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,0.35);border:2px solid rgba(34,197,94,0.6);color:white;font-size:1.6rem;cursor:pointer">↓</button>
-      <button onclick="snakeDir(1,0)" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.6rem;cursor:pointer">→</button>
+      <button onclick="snakeDir(-1,0)" style="width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.6rem;cursor:pointer">←</button>
+      <button onclick="snakeDir(0,1)" style="width:62px;height:62px;border-radius:50%;background:rgba(34,197,94,0.35);border:2px solid rgba(34,197,94,0.6);color:white;font-size:1.6rem;cursor:pointer">↓</button>
+      <button onclick="snakeDir(1,0)" style="width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.6rem;cursor:pointer">→</button>
     </div>
-    <button onclick="startSnake()" id="snake-start-btn" style="padding:12px 32px;background:linear-gradient(135deg,#22c55e,#15803d);border:none;border-radius:24px;color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 #14532d">🐍 开始游戏！</button>
+    <button onclick="startSnake()" id="snake-start-btn" style="padding:10px 32px;background:linear-gradient(135deg,#22c55e,#15803d);border:none;border-radius:24px;color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 #14532d">🐍 开始游戏！</button>
   </div>
 </div>
 
@@ -654,14 +657,15 @@ body {
     <div class="game-topbar-title" style="color:white">💎 消消乐</div>
     <div class="score-display" id="m3-score-top">⭐ 0</div>
   </div>
-  <div class="game-content" style="padding:10px 16px 20px;align-items:center;gap:10px">
+  <div class="game-content" style="padding:6px 12px 10px;align-items:center;gap:8px">
     <div style="display:flex;gap:24px;justify-content:center">
       <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">得分<br><span id="m3-score" style="font-size:1.4rem;font-weight:700;color:#FCD34D">0</span></div>
       <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">步数<br><span id="m3-moves" style="font-size:1.4rem;font-weight:700;color:#f0abfc">30</span></div>
       <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:0.85rem">目标<br><span id="m3-target" style="font-size:1.4rem;font-weight:700;color:#34D399">500</span></div>
     </div>
+    <!-- canvas size set by initMatch3() -->
     <canvas id="m3-canvas" width="320" height="320" style="border-radius:16px;touch-action:none;cursor:pointer"></canvas>
-    <button onclick="startMatch3()" id="m3-start-btn" style="padding:12px 32px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;border-radius:24px;color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 #5b21b6">💎 开始游戏！</button>
+    <button onclick="startMatch3()" id="m3-start-btn" style="padding:10px 32px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;border-radius:24px;color:white;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 0 #5b21b6">💎 开始游戏！</button>
   </div>
 </div>
 
@@ -2323,6 +2327,9 @@ window.openGame=function(name){
   if(name==='piano') setTimeout(initPiano,50);
   if(name==='dotconnect') setTimeout(initDotConnect,50);
   if(name==='cake') setTimeout(initCake,50);
+  if(name==='tetris') setTimeout(initTetris,50);
+  if(name==='snake') setTimeout(initSnake,50);
+  if(name==='match3') setTimeout(initMatch3,50);
 };
 </script>
 
@@ -4142,6 +4149,27 @@ function stopMaze(){
 // ══════════════════════════════
 // TETRIS
 // ══════════════════════════════
+function initTetris(){
+  const cv=document.getElementById('tetris-canvas');
+  if(!cv) return;
+  // topbar≈56, stats+next row≈52, controls≈134, gaps+padding≈36
+  const overhead=56+52+134+36;
+  const maxH=window.innerHeight-overhead;
+  const maxW=Math.min(window.innerWidth-24, 480);
+  // Tetris board is 10:20 (width:height)
+  let w=Math.min(maxW, Math.floor(maxH/2));
+  // Snap to column width multiple for crisp pixels
+  w=Math.floor(w/10)*10;
+  const h=w*2;
+  cv.width=w; cv.height=h;
+  cv.style.width=w+'px'; cv.style.height=h+'px';
+  // Scale next piece canvas proportionally
+  const nc=document.getElementById('tetris-next');
+  const ns=Math.max(48,Math.min(72,Math.floor(w*0.28)));
+  if(nc){nc.width=ns;nc.height=ns;nc.style.width=ns+'px';nc.style.height=ns+'px';}
+  tetrisDraw();
+}
+
 const TETRIS_COLS=10, TETRIS_ROWS=20;
 const TETRIS_PIECES=[
   {shape:[[1,1,1,1]],color:'#22d3ee'},          // I
@@ -4349,7 +4377,20 @@ function stopTetris(){
 // ══════════════════════════════
 // SNAKE
 // ══════════════════════════════
-const SNAKE_CELL=20, SNAKE_COLS=16, SNAKE_ROWS=16;
+function initSnake(){
+  const cv=document.getElementById('snake-canvas');
+  if(!cv) return;
+  // topbar≈56, stats≈52, controls≈140, gaps+padding≈28, start-btn≈48
+  const overhead=56+52+140+28+48;
+  const maxSq=Math.min(window.innerWidth-24, window.innerHeight-overhead, 600);
+  // Snap to 16-cell multiple for crisp pixels
+  const size=Math.floor(maxSq/SNAKE_COLS)*SNAKE_COLS;
+  cv.width=size; cv.height=size;
+  cv.style.width=size+'px'; cv.style.height=size+'px';
+  snakeDraw();
+}
+
+const SNAKE_COLS=16, SNAKE_ROWS=16;
 let snakeBody=[], snakeDx=1, snakeDy=0, snakeNextDx=1, snakeNextDy=0;
 let snakeFood={x:0,y:0}, snakeScore=0, snakeBest=0;
 let snakeRunning=false, snakeTimerID=null, snakeSpeed=200;
@@ -4488,7 +4529,20 @@ function stopSnake(){
 // ══════════════════════════════
 // MATCH-3 (消消乐)
 // ══════════════════════════════
-const M3_COLS=8, M3_ROWS=8, M3_CELL=40;
+function initMatch3(){
+  const cv=document.getElementById('m3-canvas');
+  if(!cv) return;
+  // topbar≈56, stats≈52, start-btn≈48, gaps+padding≈32
+  const overhead=56+52+48+32;
+  const maxSq=Math.min(window.innerWidth-24, window.innerHeight-overhead, 640);
+  // Snap to 8-cell multiple for crisp pixels
+  const size=Math.floor(maxSq/M3_COLS)*M3_COLS;
+  cv.width=size; cv.height=size;
+  cv.style.width=size+'px'; cv.style.height=size+'px';
+  m3Draw();
+}
+
+const M3_COLS=8, M3_ROWS=8;
 const M3_GEMS=['🔴','🟡','🔵','🟢','🟣','🟠'];
 let m3Board=[], m3Score=0, m3Moves=30, m3Target=500;
 let m3Selected=null, m3Animating=false, m3Running=false;
@@ -4527,21 +4581,22 @@ function m3Draw(highlights=[]){
   const cv=document.getElementById('m3-canvas');
   if(!cv) return;
   const ctx=cv.getContext('2d');
+  const cell=cv.width/M3_COLS;
   ctx.fillStyle='#3b0764'; ctx.fillRect(0,0,cv.width,cv.height);
   const hw=new Set(highlights.map(h=>`${h.r},${h.c}`));
   for(let r=0;r<M3_ROWS;r++){
     for(let c=0;c<M3_COLS;c++){
-      const x=c*M3_CELL,y=r*M3_CELL;
+      const x=c*cell,y=r*cell;
       const isSel=m3Selected&&m3Selected.r===r&&m3Selected.c===c;
       const isHL=hw.has(`${r},${c}`);
       ctx.fillStyle=isSel?'rgba(255,255,100,0.45)':isHL?'rgba(255,100,100,0.4)':'rgba(255,255,255,0.07)';
-      ctx.beginPath(); ctx.roundRect(x+2,y+2,M3_CELL-4,M3_CELL-4,8); ctx.fill();
-      if(isSel){ctx.strokeStyle='#fde68a';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x+2,y+2,M3_CELL-4,M3_CELL-4,8);ctx.stroke();}
+      ctx.beginPath(); ctx.roundRect(x+2,y+2,cell-4,cell-4,8); ctx.fill();
+      if(isSel){ctx.strokeStyle='#fde68a';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x+2,y+2,cell-4,cell-4,8);ctx.stroke();}
       if(m3Board[r][c]){
-        ctx.font=`${M3_CELL*0.65}px serif`;
+        ctx.font=`${cell*0.65}px serif`;
         ctx.textAlign='center'; ctx.textBaseline='middle';
         ctx.fillStyle='white';
-        ctx.fillText(m3Board[r][c],x+M3_CELL/2,y+M3_CELL/2);
+        ctx.fillText(m3Board[r][c],x+cell/2,y+cell/2);
       }
     }
   }
@@ -4607,8 +4662,9 @@ function startMatch3(){
     if(!m3Running||m3Animating) return;
     const rect=cv.getBoundingClientRect();
     const scaleX=cv.width/rect.width, scaleY=cv.height/rect.height;
-    const c=Math.floor((e.clientX-rect.left)*scaleX/M3_CELL);
-    const r=Math.floor((e.clientY-rect.top)*scaleY/M3_CELL);
+    const cell=cv.width/M3_COLS;
+    const c=Math.floor((e.clientX-rect.left)*scaleX/cell);
+    const r=Math.floor((e.clientY-rect.top)*scaleY/cell);
     if(r<0||r>=M3_ROWS||c<0||c>=M3_COLS) return;
     if(!m3Selected){ m3Selected={r,c}; m3Draw(); playSound(440,'sine',0.05,0.1); }
     else {
@@ -4624,8 +4680,9 @@ function startMatch3(){
     e.preventDefault();
     const rect=cv.getBoundingClientRect();
     const scaleX=cv.width/rect.width, scaleY=cv.height/rect.height;
-    const c=Math.floor((e.touches[0].clientX-rect.left)*scaleX/M3_CELL);
-    const r=Math.floor((e.touches[0].clientY-rect.top)*scaleY/M3_CELL);
+    const cell=cv.width/M3_COLS;
+    const c=Math.floor((e.touches[0].clientX-rect.left)*scaleX/cell);
+    const r=Math.floor((e.touches[0].clientY-rect.top)*scaleY/cell);
     if(r<0||r>=M3_ROWS||c<0||c>=M3_COLS) return;
     if(!m3Selected){ m3Selected={r,c}; m3Draw(); }
     else {
